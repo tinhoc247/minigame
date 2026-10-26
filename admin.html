@@ -465,6 +465,6 @@ if(!HW.on){if(!ADM)lobby();else{document.querySelectorAll('button[onclick="openJ
 (function(){const _dj=doJoin;doJoin=async function(){try{await _dj()}catch(e){const x=$('#jE');if(x)x.textContent='Lỗi kết nối: '+e.message}};
  if(!ADM)return;const d=document.createElement('div');d.style.cssText='position:fixed;inset:0;z-index:99;display:flex;align-items:center;justify-content:center;padding:12px;background:linear-gradient(135deg,var(--bg1),var(--bg2))';
  d.innerHTML='<div class="card" style="max-width:360px;width:100%;text-align:center"><h2>🔑 Đăng nhập admin</h2><input class="fld" id="aP" type="password" placeholder="Mật khẩu admin"><p id="aE" style="color:var(--badc);font-weight:700"></p><button id="aB" style="width:100%">Đăng nhập</button></div>';document.body.appendChild(d);
- const go=async()=>{ADMPW=$('#aP').value;$('#aE').textContent='';try{await fbAuth();d.remove()}catch(e){$('#aE').textContent='Không đăng nhập được: '+e.message}};$('#aB').onclick=go;$('#aP').onkeydown=e=>e.key=='Enter'&&go()})();
+ const go=async()=>{ADMPW=$('#aP').value;$('#aE').textContent='';try{await fbAuth();d.remove()}catch(e){$('#aE').textContent='Không đăng nhập được: '+e.message}};$('#aB').onclick=go;$('#aP').onkeydown=e=>{if(e.key=='Enter')go()}})();
 </script>
 </body></html>
