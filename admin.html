@@ -57,6 +57,7 @@ select:disabled{opacity:1;color:var(--ink);-webkit-text-fill-color:var(--ink)}
 #modal .hint{font-size:15px}.imgerr{display:block;font-size:14px;color:var(--badc);margin:4px 0;word-break:break-all}
 .area{padding:12px 16px;margin:8px 0;border-radius:14px;background:rgba(14,165,233,.14);border:2px solid rgba(14,165,233,.45)}
 .area select,.qr select{background:var(--card);border:2px solid #0ea5e9;font-size:18px}
+.pulse{transform-box:fill-box;transform-origin:center;animation:pl 1s ease-in-out infinite alternate}@keyframes pl{from{transform:scale(1);opacity:1}to{transform:scale(1.3);opacity:.45}}.team.cp{padding:2px 6px;font-size:12px;gap:4px}.team.cp .em{font-size:16px}#teamList{flex:none}.side>*{flex-shrink:0}
 </style><style>.sb{width:100%;border-collapse:collapse;font-size:15px;text-align:left}.sb td,.sb th{padding:5px 6px;border-bottom:1px solid var(--line)}.bar{height:10px;border-radius:6px;background:#ef4444}.fld{display:block;width:100%;margin:4px 0}.code{font-size:34px;letter-spacing:6px;font-weight:800;color:#0369a1}</style><style>
 /* ===== Giao diện admin (phóng to, gọn, ghi chú thu vào biểu tượng) ===== */
 .inf{flex:0 0 auto;width:30px;height:30px;padding:0;margin:0 0 0 6px;border-radius:50%;font:italic 800 17px/30px Georgia,serif;text-align:center;background:rgba(14,165,233,.18);color:#0ea5e9;box-shadow:none;border:2px solid rgba(14,165,233,.55);vertical-align:middle}
@@ -83,6 +84,7 @@ select:disabled{opacity:1;color:var(--ink);-webkit-text-fill-color:var(--ink)}
 .adm #modal .box{border-radius:26px;padding:clamp(20px,3vw,36px)}
 .frow{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin:12px 0;text-align:left}
 .err{color:var(--badc);font-weight:700;min-height:1.3em;margin:8px 0}
+.scr{max-height:42vh;overflow:auto;text-align:left;margin:10px 0;padding:6px;border-radius:12px;background:rgba(14,165,233,.07)}.scr .chip{font-size:15px;padding:4px 9px;margin:3px;cursor:default}.scr th{position:sticky;top:0;background:var(--card)}
 .btns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:12px}
 .adm .btns button{font-size:18px;padding:12px 24px}
 </style>
@@ -91,7 +93,7 @@ select:disabled{opacity:1;color:var(--ink);-webkit-text-fill-color:var(--ink)}
 <div id="setup"><div class="setup">
  <div style="grid-column:1/-1"><h1>🏝️ Truy Tìm Kho Báu</h1></div>
  <div class="card" id="mapCard"><div class="sh"><span class="num">1</span><h2>Bản đồ</h2><button type="button" class="inf" data-i="Số trạm = số hình tròn “?” trên mỗi hướng (không giới hạn).&#10;Trong đó 2/3 số trạm (làm tròn, không tính trạm đầu tiên) là nguy hiểm ẩn ngẫu nhiên." aria-label="Ghi chú">i</button></div>
-  <div class="fgrid"><label>Số hướng đi <select id="kPaths"><option>2</option><option selected>3</option><option>4</option><option>5</option></select></label>
+  <div class="fgrid"><label>Số hướng <select id="kPaths"><option selected>4</option></select></label>
   <label>Trạm/hướng <input id="mSt" type="number" min="1" value="5"></label>
   <label>Lối đi <select id="pType"><option value="mix">Ngẫu nhiên</option><option value="grass">Cỏ xanh</option><option value="stone">Đá</option></select></label></div></div>
  <div class="card" id="qCard"><div class="sh"><span class="num">2</span><h2>Câu hỏi</h2><button type="button" class="inf" data-i="Excel: cột A câu hỏi, B–E đáp án A–D, F đáp án đúng (A–D hoặc 1–4), G link hình.&#10;Hỗ trợ ngân hàng Spark (cột “Dữ liệu JSON”): single, multiple, list, matching, classify, classify2, ordering, position, imagepoint, dragfill, selectfill.&#10;Ảnh: để thư mục image/ cạnh file HTML hoặc bấm “Thư mục ảnh”; hình đặt trong thư mục (vd. image/…) cùng cấp với file HTML.&#10;Chưa nạp file thì dùng câu mẫu." aria-label="Ghi chú">i</button></div>
@@ -108,7 +110,7 @@ select:disabled{opacity:1;color:var(--ink);-webkit-text-fill-color:var(--ink)}
  <button onclick="start()" style="grid-column:1/-1;font-size:20px">▶ Bắt đầu chơi</button>
 </div></div>
 
-<div id="gamev" style="display:none"><div class="game"><div class="mapw"><svg id="map" viewBox="0 0 800 450"></svg></div>
+<div id="gamev" style="display:none"><div class="game"><div class="mapw"><svg id="map" viewBox="0 0 800 600"></svg></div>
 <div class="side"><div id="teamList"></div>
  <div class="card"><div id="turn" style="font-weight:700;margin-bottom:6px"></div><div id="act"></div><div id="log"></div></div>
  <button class="alt" id="mus" onclick="toggleMusic()">🎵 Nhạc: Bật</button><button class="alt" onclick="location.reload()">↺ Cài đặt lại</button><details class="card" id="guide" style="font-size:13px;line-height:1.5"><summary style="font-weight:800;cursor:pointer">📖 Hướng dẫn cách chơi</summary><ol style="margin:6px 0 0;padding-left:18px"><li><b>Mục tiêu:</b> về đích 💰 kho báu trước.</li><li>Đến lượt, bấm <b>🎯 Trả lời câu hỏi</b>. Đúng: +50 vàng, tiến 1 trạm và mở 1 rương. Sai: mất lượt.</li><li><b>Rương</b> có thể là vàng, nhân đôi hoặc mất nửa vàng, rương rỗng, hoặc năng lực: 🛡️ vượt nguy hiểm, 🚀 tiến thêm 1 trạm, ❄️ đóng băng đối phương.</li><li><b>Chướng ngại</b> (🕳️ 🌲 🐍 🌊 🔥…): dùng đúng vật dụng hoặc trả lời đúng câu hỏi để vượt. Vượt xong, tại trạm phải trả lời thêm 1 câu: đúng mới mở rương, sai thì trả lời lại. Không vượt được thì đứng yên.</li><li><b>🏪 Cửa hàng:</b> dùng vàng mua vật dụng (🏹 🦺 🌉 🧭 🛶 🥾), có thể mở ngay khi gặp chướng ngại.</li></ol></details></div></div></div>
@@ -117,8 +119,9 @@ select:disabled{opacity:1;color:var(--ink);-webkit-text-fill-color:var(--ink)}
 <script>
 const SRC='<!DOCTYPE html>'+document.documentElement.outerHTML;const $=s=>document.querySelector(s),esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const COL=new Proxy(['#ef4444','#3b82f6','#f59e0b','#8b5cf6','#10b981','#ec4899','#14b8a6','#84cc16'],{get:(a,k)=>/^\d+$/.test(k)&&k>=a.length?`hsl(${k*47%360} 70% 50%)`:a[k]}),EMO=new Proxy(['🦊','🐼','🦁','🐯','🐸','🐵','🐰','🐻','🐨','🦄','🐙','🐧','🦉','🐢','🐬','🦋'],{get:(a,k)=>/^\d+$/.test(k)?a[k%a.length]:a[k]}),DC=['🌲','🌳','🌴','🕳️','🐍','🐊','🦂','🐺','🐻','🦖','🪨','🍄','🌵','🕷️','🦅','🐘','🌊','🔥'],DZ=[['🕳️','hố sâu',['bridge']],['🌲','rừng sâu',['compass']],['🐍','rắn độc',['bow','armor']],['🐊','cá sấu',['bow','armor']],['🦂','bọ cạp',['bow','armor']],['🐺','sói dữ',['bow','armor']],['🌊','sóng lớn',['raft']],['🔥','dung nham',['boots']]],ITM={bow:['🏹','Cung',150,'động vật nguy hiểm'],armor:['🦺','Áo giáp',200,'động vật nguy hiểm'],bridge:['🌉','Vật liệu xây cầu',150,'hố sâu'],compass:['🧭','La bàn',120,'rừng sâu'],raft:['🛶','Bè gỗ',150,'sóng lớn'],boots:['🥾','Giày chịu nhiệt',200,'dung nham']};
-const S={x:330,y:395},G={x:520,y:85};
-const ISL='M300 40C360 25 470 30 540 55C600 70 640 110 625 160C690 190 700 250 650 290C670 340 640 400 560 425C490 445 420 440 360 425C290 440 240 400 255 350C215 310 235 255 270 225C255 170 260 100 300 40Z';
+const S={x:95,y:95};const G={x:400,y:300},DIRS=[{n:'Tây Bắc',a:'↖️',x:95,y:95},{n:'Đông Bắc',a:'↗️',x:705,y:95},{n:'Đông Nam',a:'↘️',x:705,y:505},{n:'Tây Nam',a:'↙️',x:95,y:505}];
+const ISL=(()=>{const f=[1,.93,1.06,.95,1,.9,1.05,.94,1.02,.96,1.06,.92],pt=f.map((m,i)=>{const a=i*Math.PI/6;return[400+Math.cos(a)*190*m,300+Math.sin(a)*140*m]}),n=pt.length,r=v=>v.toFixed(1);let d='M'+r(pt[0][0])+' '+r(pt[0][1]);
+ for(let i=0;i<n;i++){const a=pt[(i-1+n)%n],b=pt[i],c=pt[(i+1)%n],e=pt[(i+2)%n];d+=`C${r(b[0]+(c[0]-a[0])/6)} ${r(b[1]+(c[1]-a[1])/6)} ${r(c[0]-(e[0]-b[0])/6)} ${r(c[1]-(e[1]-b[1])/6)} ${r(c[0])} ${r(c[1])}`}return d+'Z'})();
 let Q=[
 {q:'Phần mềm nào dùng để soạn thảo văn bản?',o:['Word','Excel','PowerPoint','Paint'],a:0},
 {q:'Phím tắt để sao chép (Copy) là?',o:['Ctrl+V','Ctrl+C','Ctrl+X','Ctrl+Z'],a:1},
@@ -178,79 +181,107 @@ function ob(q,i,p){const o=q.oi&&q.oi[i],m=o&&o.src?imgH(o.src,'oimg'):'',t=(p||
 function pickQ(){if(!pool.length)pool=shuffle(Q);let i=pool.findIndex(q=>(q.ty||'single')!=lastTy);if(i<0)i=0;const q=pool.splice(i,1)[0];lastTy=q.ty||'single';return q}
 
 function start(){if((!pools.length||PK!=key())&&!split())return;if(pools.length==1&&AVSEL)EMO[0]=AVSEL;startMusic();
- K=+$('#kPaths').value;M=Math.max(1,Math.floor(+$('#mSt').value)||5);
+ K=4;M=Math.max(1,Math.floor(+$('#mSt').value)||5);
  T=pools.map((m,i)=>({name:SOLO?esc(m[0]):'Đội '+(i+1),members:m,gold:0,inv:{},shield:0,frozen:false,path:0,pos:0}));
  ST={ok:0,bad:0};H=[];pool=[];lastTy='';cur=0;ri=0;phase='route';build($('#pType').value);$('#setup').style.display='none';$('#gamev').style.display='block';$('#guide').open=innerWidth>760;draw();render()}
 function randRoutes(){while(ri<T.length){T[ri].path=Math.random()*K|0;ri++}phase='play';cur=0;log('Bắt đầu! '+T[0].name+' đi trước.');render()}
-function setRoute(j){T[ri].path=j;log(`${T[ri].name} chọn hướng ${j+1}`);ri++;if(ri>=T.length){phase='play';cur=0;log('Bắt đầu! '+T[0].name+' đi trước.')}render()}
+function setRoute(j){T[ri].path=j;log(`${T[ri].name} chọn hướng ${DIRS[j].n}`);ri++;if(ri>=T.length){phase='play';cur=0;log('Bắt đầu! '+T[0].name+' đi trước.')}render()}
 
-const ISN=ISL.match(/-?\d+(?:\.\d+)?/g).map(Number),ISPATH=new Path2D(ISL),ICTX=document.createElement('canvas').getContext('2d'),CEN={x:450,y:235};
+const mulb=a=>()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296};
+const ISPATH=new Path2D(ISL),ICTX=document.createElement('canvas').getContext('2d');
 const inIsl=(x,y)=>ICTX.isPointInPath(ISPATH,x,y);
-const ISB=(()=>{const a=[];let p=[ISN[0],ISN[1]];for(let k=2;k+5<ISN.length;k+=6){const[x1,y1,x2,y2,x3,y3]=ISN.slice(k,k+6);for(let s=0;s<14;s++){const t=s/14,u=1-t;a.push({x:u*u*u*p[0]+3*u*u*t*x1+3*u*t*t*x2+t*t*t*x3,y:u*u*u*p[1]+3*u*u*t*y1+3*u*t*t*y2+t*t*t*y3})}p=[x3,y3]}return a})();
 const tri=u=>4*Math.abs(u-Math.floor(u)-.5)-1,RR=(a,b)=>a+Math.random()*(b-a);
 function resample(pts,n){const c=[0];for(let i=1;i<pts.length;i++)c.push(c[i-1]+Math.hypot(pts[i].x-pts[i-1].x,pts[i].y-pts[i-1].y));const tot=c[c.length-1],out=[];let k=1;for(let i=0;i<=n;i++){const d=tot*i/n;while(k<pts.length-1&&c[k]<d)k++;const a=pts[k-1],b=pts[k],l=c[k]-c[k-1]||1,f=Math.min(1,Math.max(0,(d-c[k-1])/l));out.push({x:a.x+(b.x-a.x)*f,y:a.y+(b.y-a.y)*f})}return out}
-function smooth(p,w,it){for(let r=0;r<it;r++){const q=p.slice();for(let i=1;i<p.length-1;i++){let x=0,y=0,c=0;for(let j=-w;j<=w;j++){const m=p[i+j];if(m){x+=m.x;y+=m.y;c++}}q[i]={x:x/c,y:y/c}}p=q}return p}
-function rawRoute(st){const dx=G.x-S.x,dy=G.y-S.y,len=Math.hypot(dx,dy),nx=-dy/len,ny=dx/len,sg=Math.random()<.5?1:-1,N=240,pts=[];
- if(st=='edgeL'||st=='edgeR'){const left=st=='edgeL',B=ISB,nB=B.length;let iS=0,iG=0,dS=1e9,dG=1e9;
-  B.forEach((p,i)=>{const a=Math.hypot(p.x-S.x,p.y-S.y),b=Math.hypot(p.x-G.x,p.y-G.y);if(a<dS){dS=a;iS=i}if(b<dG){dG=b;iG=i}});
-  const d=RR(24,36),ins=p=>{const vx=CEN.x-p.x,vy=CEN.y-p.y,l=Math.hypot(vx,vy)||1;return{x:p.x+vx/l*d,y:p.y+vy/l*d}},step=left?1:-1,seq=[];
-  let i=iS,started=false;
-  for(let c=0;c<nB;c++){const p=ins(B[i]);if(!started&&(left?p.x<S.x-40:p.x>S.x+40))started=true;
-   if(started){seq.push(p);if(left?(p.x>G.x-40&&p.y<G.y+60):(p.x<G.x+40&&p.y<G.y+60))break}
-   i=(i+step+nB)%nB}
-  return smooth([{x:S.x,y:S.y},...seq,{x:G.x,y:G.y}],2,3)}
- let f;
- if(st=='arcL'||st=='arcR'){const A=RR(55,115)*(st=='arcL'?-1:1);f=t=>A*Math.pow(Math.sin(Math.PI*t),.7)}
- else if(st=='zig'){const n=[1.5,2,2.5,3][Math.random()*4|0],A=RR(38,62)*sg;f=t=>A*tri(t*n+.25)*Math.pow(Math.sin(Math.PI*t),.35)}
- else if(st=='snake'){const n=[1,1.5,2][Math.random()*3|0],A=RR(50,80)*sg;f=t=>A*Math.sin(2*Math.PI*n*t)*Math.pow(Math.sin(Math.PI*t),.5)}
- else{const A=RR(20,30)*sg;f=t=>A*Math.sin(2*Math.PI*3.5*t)*Math.pow(Math.sin(Math.PI*t),.5)}
- for(let i=0;i<=N;i++){const t=i/N,o=f(t);pts.push({x:S.x+dx*t+nx*o,y:S.y+dy*t+ny*o})}return pts}
-function okRoute(L){let bad=0;for(const q of L)if(!inIsl(q.x,q.y))bad++;return bad<=3}
+const plen=L=>{let l=0;for(let i=1;i<L.length;i++)l+=Math.hypot(L[i].x-L[i-1].x,L[i].y-L[i-1].y);return l};
+/* Đường từ bến thuyền s tới kho báu G; A = biên độ uốn, n = số nhịp. */
+function rawRoute(s,st,A,n){const dx=G.x-s.x,dy=G.y-s.y,len=Math.hypot(dx,dy),nx=-dy/len,ny=dx/len,N=240,pts=[],e=(t,p)=>Math.pow(Math.sin(Math.PI*t),p),
+ f=st=='arc'?t=>A*e(t,.7):st=='zig'?t=>A*tri(t*n+.25)*e(t,.35):st=='snake'?t=>A*Math.sin(2*Math.PI*n*t)*e(t,.5):t=>A*Math.sin(2*Math.PI*3.5*t)*e(t,.5);
+ for(let i=0;i<=N;i++){const t=i/N,o=f(t);pts.push({x:s.x+dx*t+nx*o,y:s.y+dy*t+ny*o})}return pts}
+/* Chỉnh biên độ để 4 hướng có độ dài gần bằng nhau (công bằng). */
+function fitRoute(s,st,n,sg,Tl){const mk=A=>resample(rawRoute(s,st,A*sg,n),120);if(plen(mk(0))>=Tl)return mk(RR(8,18));let lo=0,hi=110;for(let k=0;k<14;k++){const m=(lo+hi)/2;if(plen(mk(m))<Tl)lo=m;else hi=m}return mk((lo+hi)/2)}
+/* Hợp lệ: nằm trong khung, đi biển rồi cập bờ đúng 1 lần, không lấn sang hướng khác (trong nan quạt ±45°). */
+function okRoute(L,s,free){const ax=s.x-G.x,ay=s.y-G.y,al=Math.hypot(ax,ay); for(const q of L){if(q.x<30||q.x>770||q.y<30||q.y>570)return false;
+  const vx=q.x-G.x,vy=q.y-G.y,vl=Math.hypot(vx,vy);if(!free&&vl>40&&(vx*ax+vy*ay)/(vl*al)<.707)return false;
+  }
+ return inIsl(L[L.length-1].x,L[L.length-1].y)}
+const MAPS={mix:'Uốn lượn hỗn hợp',straight:'Đường thẳng',arc:'Đường cong',zig:'Zigzag',snake:'Rắn uốn',stair:'Bậc thang',spiral:'Xoắn ốc'};
+function pickMap(){const k=Object.keys(MAPS);return k[Math.random()*k.length|0]}
+/* Bậc thang: đi ngang/dọc xen kẽ; các góc chéo nhau bắt đầu khác hướng để 4 đường không trùng nhau. */
+function stairRoute(s,ns,hFirst){const dx=G.x-s.x,dy=G.y-s.y,w=()=>{const a=Array.from({length:ns},()=>RR(.6,1.4)),t=a.reduce((x,y)=>x+y,0);return a.map(v=>v/t)},wx=w(),wy=w(),pts=[{x:s.x,y:s.y}];let x=s.x,y=s.y;
+ for(let k=0;k<ns;k++){const mh=()=>{x+=dx*wx[k];pts.push({x,y})},mv=()=>{y+=dy*wy[k];pts.push({x,y})};if(hFirst){mh();mv()}else{mv();mh()}}
+ pts[pts.length-1]={x:G.x,y:G.y};return resample(pts,120)}
+/* Xoắn ốc: cả 4 đường cùng xoay 1 chiều quanh kho báu nên không cắt nhau. */
+function spiralRoute(s,th){const p0=Math.atan2(s.y-G.y,s.x-G.x),R=Math.hypot(s.x-G.x,s.y-G.y),pts=[];for(let i=0;i<=240;i++){const t=i/240,r=R*(1-t),a=p0+th*t;pts.push({x:G.x+Math.cos(a)*r,y:G.y+Math.sin(a)*r})}return resample(pts,120)}
 function nodeAt(L,f){const x=f*(L.length-1),i=Math.min(L.length-2,Math.floor(x)),u=x-i;return{x:L[i].x+(L[i+1].x-L[i].x)*u,y:L[i].y+(L[i+1].y-L[i].y)*u}}
-function build(type){P=[];const tot=M,pool=shuffle(['arcL','arcR','zig','snake','wave','edgeL','edgeR']);
- for(let i=0;i<K;i++){const st=pool[i%pool.length];let best=null,bc=1e9;
-  for(let a=0;a<120;a++){const L=resample(rawRoute(st),120);if(!okRoute(L))continue;
+function build(type){const R0=Math.random;if(window.SEED!=null)Math.random=mulb(window.SEED);try{return build0(type)}finally{Math.random=R0}}
+function build0(type){const ms=pickMap();P=[];const tot=M,sts=['arc','zig','snake','wave'],Tl=430,ns=[3,4,5][Math.random()*3|0],sg0=Math.random()<.5?1:-1,n0=[1,1.5,2,2.5][Math.random()*4|0],sp0=RR(1.1,1.6)*sg0,free=ms=='stair'||ms=='spiral',
+  gen=(s,i)=>ms=='straight'?resample([s,G],120):ms=='stair'?stairRoute(s,ns,i%2==0):ms=='spiral'?spiralRoute(s,sp0):ms=='mix'?fitRoute(s,sts[Math.random()*sts.length|0],[1,1.5,2,2.5][Math.random()*4|0],Math.random()<.5?1:-1,Tl):fitRoute(s,ms,n0,sg0,Tl);
+ for(let i=0;i<K;i++){const s=DIRS[i];let best=null,bc=1e9;
+  for(let a=0;a<150;a++){const L=gen(s,i);if(!okRoute(L,s,free))continue;
    const pos=Array.from({length:tot},(_,j)=>nodeAt(L,(j+1)/(tot+1)));let c=0;
-   P.forEach(p=>pos.forEach(q=>p.nodes.forEach(n=>{if(n.t!='start'&&n.t!='top'&&Math.hypot(n.x-q.x,n.y-q.y)<28)c++})));
+   P.forEach(p=>pos.forEach(q=>p.nodes.forEach(n=>{if(n.t!='start'&&n.t!='top'&&Math.hypot(n.x-q.x,n.y-q.y)<46)c++})));
    if(c<bc){bc=c;best=L}if(!c)break}
-  if(!best)best=resample([{x:S.x,y:S.y},{x:G.x,y:G.y}],120);
+  if(!best)best=resample([{x:s.x,y:s.y},{x:G.x,y:G.y}],120);
   const nd=Math.min(Math.round(tot*2/3),Math.max(0,tot-1)),dp=new Set();
   while(dp.size<nd)dp.add(2+(Math.random()*(tot-1)|0));
-  const nodes=[{...S,t:'start'}];
-  for(let j=1;j<=tot;j++){const d=DZ[Math.random()*DZ.length|0],isD=dp.has(j);nodes.push({...nodeAt(best,j/(tot+1)),t:isD?'danger':'q',d,dc:isD&&Math.random()<.6?d[0]:DC[Math.random()*DC.length|0]})}
-  nodes.push({...G,t:'top'});
-  let ln=0;best.forEach((q,k)=>{if(k)ln+=Math.hypot(q.x-best[k-1].x,q.y-best[k-1].y)});
-  P.push({rad:Math.max(4,Math.min(14,ln/(tot+1)*.38)),nodes,badge:nodeAt(best,1.5/(tot+1)),line:best,stone:type=='stone'||(type=='mix'&&Math.random()<.5)})}}
+  const nodes=[{x:s.x,y:s.y,t:'start',sea:false}];
+  for(let j=1;j<=tot;j++){const q=nodeAt(best,j/(tot+1)),sea=false,dz=DZ,dc=DC,d=dz[Math.random()*dz.length|0],isD=dp.has(j);
+   nodes.push({...q,t:isD?'danger':'q',sea,d,dc:isD&&Math.random()<.6?d[0]:dc[Math.random()*dc.length|0]})}
+  nodes.push({x:G.x,y:G.y,t:'top',sea:false});
+  const ln=plen(best),k=Math.max(1,best.findIndex(q=>inIsl(q.x,q.y)));
+  P.push({rad:Math.max(4,Math.min(14,ln/(tot+1)*.38)),nodes,line:best,k,stone:type=='stone'||(type=='mix'&&Math.random()<.5)})}}
 
-function draw(){const Wv=[[40,60],[90,120],[60,250],[110,330],[30,410],[190,420],[740,130],[760,260],[610,435],[160,230],[560,25],[740,330]];
+function draw(){const R0=Math.random;if(window.SEED!=null)Math.random=mulb(window.SEED+7);try{draw0()}finally{Math.random=R0}}
+function draw0(){const Wv=[];for(let i=0;i<46;i++){const x=RR(-330,1130),y=RR(-230,830);if(!inIsl(x,y))Wv.push([x,y])}
+ const wv=a=>a.map(([x,y])=>`<path d="M${x.toFixed(0)} ${y.toFixed(0)}q6-6 12 0t12 0"/>`).join(''),pl=a=>'M'+a.map(q=>q.x.toFixed(1)+' '+q.y.toFixed(1)).join('L'),
+ IDEC=['🌴','🌳','🌴','🌿','🌺','🪨','🍄','🦜'],dec=[],far=(x,y,d)=>!P.some(p=>p.line.some(q=>Math.hypot(q.x-x,q.y-y)<d));
+ for(let a=0;a<500&&dec.length<8;a++){const x=RR(215,585),y=RR(165,435);
+  if(![[0,0],[16,0],[-16,0],[0,16],[0,-16]].every(([u,v])=>inIsl(x+u,y+v))||Math.hypot(x-G.x,y-G.y)<70||!far(x,y,52)||dec.some(d=>Math.hypot(d[0]-x,d[1]-y)<64))continue;
+  dec.push([x,y,IDEC[Math.random()*IDEC.length|0]])}
+ const LAND=[[-60,-60,1,1],[860,-60,-1,1],[860,660,-1,-1],[-60,660,1,-1]].map(([cx,cy,sx,sy])=>`<ellipse cx="${cx}" cy="${cy}" rx="262" ry="222" fill="#a7f3d0" opacity=".55"/><ellipse cx="${cx}" cy="${cy}" rx="250" ry="210" fill="#f6e3a1"/><ellipse cx="${cx}" cy="${cy}" rx="232" ry="192" fill="url(#gr)"/>`+[[30,190,'🌴'],[190,30,'🌳']].map(([dx,dy,e])=>`<text x="${cx+sx*(dx+60)}" y="${cy+sy*(dy+60)}" font-size="24" text-anchor="middle" opacity=".9">${e}</text>`).join('')).join('');
+ const SEA=[[400,62,'🐋'],[400,566,'🐬'],[48,305,'🦈'],[735,310,'🐙'],[250,48,'⛵'],[560,572,'🚢']].map(([x,y,e])=>`<text x="${x}" y="${y}" font-size="28" text-anchor="middle" opacity=".75">${e}</text>`).join('');
  let s=`<defs><linearGradient id="sea" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#1fb8e4"/><stop offset=".5" stop-color="#38d9b2"/><stop offset="1" stop-color="#1cbfdc"/></linearGradient><linearGradient id="gr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b8ec55"/><stop offset="1" stop-color="#58cf5c"/></linearGradient></defs>
-<rect x="-1500" y="-1000" width="3800" height="2450" fill="url(#sea)"/><g fill="none" stroke="#fff" stroke-width="2.5" opacity=".45" stroke-linecap="round">${[[-200,40],[-60,250],[-140,330],[850,200],[900,400],[820,120],[200,-60],[600,-70],[500,500],[100,520],[-250,200],[950,100],[-90,-40],[700,520]].map(([x,y])=>`<path d="M${x} ${y}q6-6 12 0t12 0"/>`).join('')}</g><ellipse cx="-120" cy="120" rx="90" ry="45" fill="#8ee04e"/><text x="-150" y="125" font-size="30">🌴</text><text x="-100" y="118" font-size="26">🦜</text><ellipse cx="930" cy="300" rx="90" ry="40" fill="#8ee04e"/><text x="900" y="306" font-size="30">🏝️</text><text x="945" y="296" font-size="24">🦀</text><text x="-80" y="400" font-size="34">🦈</text><text x="860" y="60" font-size="30">🐙</text><text x="870" y="480" font-size="30">⛵</text><text x="-60" y="-30" font-size="30">🐬</text><text x="400" y="-40" font-size="30">🐳</text><text x="300" y="520" font-size="30">🛶</text><g fill="none" stroke="#fff" stroke-width="2.5" opacity=".45" stroke-linecap="round">${Wv.map(([x,y])=>`<path d="M${x} ${y}q6-6 12 0t12 0"/>`).join('')}</g>
-<ellipse cx="690" cy="60" rx="72" ry="30" fill="#8ee04e"/><text x="672" y="62" font-size="38">🌋</text><text x="640" y="58" font-size="20">🌴</text><text x="728" y="62" font-size="20">🌴</text>
-<ellipse cx="705" cy="395" rx="58" ry="26" fill="#8ee04e"/><text x="682" y="402" font-size="24">🌳</text>
-<ellipse cx="170" cy="140" rx="42" ry="28" fill="#8a96a3"/><ellipse cx="195" cy="150" rx="28" ry="20" fill="#a3afbb"/><ellipse cx="150" cy="330" rx="26" ry="16" fill="#8a96a3"/>
-<text x="190" y="100" font-size="34">🐋</text><text x="240" y="40" font-size="26">⛵</text><text x="690" y="225" font-size="40">🚢</text><text x="160" y="425" font-size="26">🛶</text>
-<path d="${ISL}" fill="#a7f3d0" opacity=".6" stroke="#a7f3d0" stroke-width="16" stroke-linejoin="round"/><path d="${ISL}" fill="url(#gr)"/>
-<g fill="#3fae49" opacity=".4"><ellipse cx="300" cy="195" rx="30" ry="16"/><ellipse cx="580" cy="250" rx="26" ry="14"/><ellipse cx="450" cy="390" rx="34" ry="14"/><ellipse cx="380" cy="120" rx="24" ry="12"/></g>
-<polygon points="405,135 435,95 465,135" fill="#f2cf5b"/><polygon points="435,95 465,135 445,135" fill="#d9a93a"/>
-<text x="258" y="272" font-size="24">🌴</text><text x="600" y="245" font-size="22">🌳</text><text x="262" y="352" font-size="22">🌵</text><text x="372" y="168" font-size="20">🦴</text><text x="580" y="310" font-size="22">🗿</text><text x="604" y="318" font-size="22">🗿</text><text x="605" y="115" font-size="22">🌴</text><text x="555" y="398" font-size="22">🌳</text><text x="570" y="180" font-size="30">🎈</text>`;
- P.forEach(p=>{const d='M'+p.line.map(q=>q.x.toFixed(1)+' '+q.y.toFixed(1)).join('L');
-  if(p.stone)s+=`<path d="${d}" fill="none" stroke="#9ca3af" stroke-width="11" stroke-linecap="round" opacity=".85"/>`;
-  s+=`<path d="${d}" fill="none" stroke="#fff" stroke-width="3" stroke-dasharray="8 7" stroke-linecap="round"/>`});
- P.forEach(p=>p.nodes.forEach(n=>{if(n.t=='q'||n.t=='danger')s+=`<text x="${n.x+((n.x|0)%2?1:-1)*(p.rad+7)}" y="${n.y-p.rad*.4}" font-size="${Math.max(11,p.rad*1.5)}" text-anchor="middle">${n.dc}</text>`+`<circle cx="${n.x}" cy="${n.y}" r="${p.rad}" fill="#7dd3fc"/><circle cx="${n.x}" cy="${n.y}" r="${p.rad*.72}" fill="#0ea5e9"/><text x="${n.x}" y="${n.y+p.rad*.36}" font-size="${p.rad*1.05}" font-weight="700" text-anchor="middle" fill="#fff">${p.rad>=6?'?':''}</text>`}));
- P.forEach((p,j)=>{s+=`<circle cx="${p.badge.x}" cy="${p.badge.y}" r="9" fill="#fff" stroke="#f97316" stroke-width="2.5"/><text x="${p.badge.x}" y="${p.badge.y+4.5}" font-size="12" font-weight="700" text-anchor="middle" fill="#c2410c">${j+1}</text>`});
- const y=S.y+26;
- s+=`<circle cx="${G.x}" cy="${G.y}" r="24" fill="#fff" opacity=".4"/><text x="${G.x}" y="${G.y+12}" font-size="34" text-anchor="middle">💰</text>
-<polygon points="${S.x-44},${y} ${S.x-31},${y-15} ${S.x+31},${y-15} ${S.x+44},${y} ${S.x+31},${y+15} ${S.x-31},${y+15}" fill="#d4721c" stroke="#fcd9a0" stroke-width="3"/><text x="${S.x}" y="${y+6}" font-size="16" font-weight="800" text-anchor="middle" fill="#fff" stroke="#7c3a0a" stroke-width="3" paint-order="stroke">START</text><g id="pawns"></g>`;
+<rect x="-1500" y="-1000" width="3800" height="2600" fill="url(#sea)"/><g fill="none" stroke="#fff" stroke-width="2.5" opacity=".3" stroke-linecap="round">${wv(Wv)}</g>${SEA}
+${LAND}
+<path d="${ISL}" fill="#a7f3d0" opacity=".55" stroke="#a7f3d0" stroke-width="34" stroke-linejoin="round"/><path d="${ISL}" fill="#f6e3a1" stroke="#f6e3a1" stroke-width="8" stroke-linejoin="round"/>
+<path d="${ISL}" fill="url(#gr)" transform="translate(400 300) scale(.93) translate(-400 -300)"/><ellipse cx="400" cy="300" rx="125" ry="88" fill="#3fae49" opacity=".25"/>
+<ellipse cx="${G.x}" cy="${G.y}" rx="44" ry="31" fill="#f6e3a1" opacity=".92" stroke="#d9b84a" stroke-width="3" stroke-dasharray="5 4"/>
+${dec.map(([x,y,e])=>`<text x="${x.toFixed(0)}" y="${y.toFixed(0)}" font-size="22" text-anchor="middle" opacity=".85">${e}</text>`).join('')}`;
+ DIRS.forEach(d=>{s+=`<circle cx="${d.x}" cy="${d.y}" r="36" fill="#fff" fill-opacity=".55" stroke="#d4721c" stroke-width="3" stroke-dasharray="6 5"/>`});
+ P.forEach(p=>{const d=pl(p.line);
+  s+=`<path d="${d}" fill="none" stroke="#f6e3a1" stroke-width="30" stroke-linecap="round" stroke-linejoin="round"/><path d="${d}" fill="none" stroke="#7fd957" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>`;
+  if(p.stone)s+=`<path d="${d}" fill="none" stroke="#9ca3af" stroke-width="9" stroke-linecap="round" opacity=".85"/>`;
+  s+=`<path d="${d}" fill="none" stroke="#fff" stroke-width="2.5" stroke-dasharray="8 7" stroke-linecap="round"/>`});
+ P.forEach(p=>p.nodes.forEach((n,j)=>{if(n.t!='q'&&n.t!='danger')return;const r=Math.max(7,Math.min(16,plen(p.line)/(M+1)*.42)),A=p.nodes[j-1],B=p.nodes[j+1],tx=B.x-A.x,ty=B.y-A.y,tl=Math.hypot(tx,ty)||1,sg=j%2?1:-1,ex=(n.x-ty/tl*sg*(r+22)).toFixed(1),ey=(n.y+tx/tl*sg*(r+22)).toFixed(1);
+  s+=`<circle cx="${ex}" cy="${ey-1}" r="12" fill="#fff" opacity=".6"/><text x="${ex}" y="${+ey+5}" font-size="15" text-anchor="middle">${n.dc}</text><circle cx="${n.x}" cy="${n.y+1.5}" r="${r+1}" fill="#0003"/><circle cx="${n.x}" cy="${n.y}" r="${r}" fill="#fff"/><circle cx="${n.x}" cy="${n.y}" r="${r*.78}" fill="#0ea5e9"/><text x="${n.x}" y="${n.y+r*.38}" font-size="${r*1.15}" font-weight="800" text-anchor="middle" fill="#fff">?</text>`}));
+ DIRS.forEach(d=>{const y=d.y+52;
+  s+=`<rect x="${d.x-46}" y="${y-12}" width="92" height="24" rx="8" fill="#d4721c" stroke="#fcd9a0" stroke-width="3"/><text x="${d.x}" y="${y+5}" font-size="13" font-weight="800" text-anchor="middle" fill="#fff" stroke="#7c3a0a" stroke-width="3" paint-order="stroke">${d.n.toUpperCase()}</text>`});
+ s+=`<circle cx="${G.x}" cy="${G.y}" r="25" fill="#fff" opacity=".55"/><text x="${G.x}" y="${G.y+12}" font-size="34" text-anchor="middle">💰</text><g id="pawns"></g><g id="badges"></g>`;
  $('#map').innerHTML=s}
 
-function posOf(t,i){const n=P[t.path].nodes[t.pos],N=T.length,r=N<=4?15:N<=8?19:24,g=2*Math.PI*i/N-Math.PI/2;return[n.x+Math.cos(g)*r,n.y+Math.sin(g)*r]}
-function render(){const g=$('#pawns'),hl=phase=='route'?ri:cur;
- T.forEach((t,i)=>{let e=document.getElementById('pw'+i);if(!e){g.insertAdjacentHTML('beforeend',`<g class="pawn" id="pw${i}"><circle r="11" fill="${COL[i]}" stroke="#fff" stroke-width="3"/><text y="5.5" font-size="14" text-anchor="middle">${EMO[i]}</text>${T.length>1?`<text y="-17" font-size="11" font-weight="700" text-anchor="middle" fill="#fff" stroke="#111" stroke-width="3" paint-order="stroke">${t.name}</text>`:''}<g class="ice" style="display:none"><rect x="-15" y="-16" width="30" height="32" rx="8" fill="#bae6fd" fill-opacity=".72" stroke="#ecfeff" stroke-width="2"/><path d="M-9-9l5-3M6 7l5-3" stroke="#fff" stroke-width="2" stroke-linecap="round"/><text x="10" y="-9" font-size="11" text-anchor="middle">❄️</text></g></g>`);e=document.getElementById('pw'+i)}
-  const[x,y]=posOf(t,i);e.style.transform=`translate(${x}px,${y}px)`;e.querySelector('.ice').style.display=t.frozen?'':'none'});
- $('#teamList').innerHTML=T.map((t,i)=>`<div class="team ${i==hl?'on':''}" style="border-left:7px solid ${COL[i]}"><span class="em">${EMO[i]}</span><div style="flex:1"><b>${t.name}</b> · 💰${t.gold}${invS(t)}${t.shield?' · 🛡️×'+t.shield:''}${t.frozen?' · ❄️':''}${phase=='route'&&i>=ri?'':' · Hướng '+(t.path+1)+' · '+stn(t)}
-  ${SOLO?'':`<small>${t.members.map(esc).join(', ')}</small>`}</div></div>`).join('');
- $('#teamList').style.display=T.length==1?'none':'';if(phase=='route'){$('#turn').innerHTML=`${EMO[ri]} ${T[ri].name} chọn hướng đi:`;$('#act').innerHTML=`<div class="rts">${P.map((_,j)=>`<button onclick="setRoute(${j})">${j+1}</button>`).join('')}</div><button class="alt" onclick="randRoutes()" style="margin-top:6px;width:100%">🎲 Ngẫu nhiên</button>`}
- else{$('#turn').innerHTML=`<div style="font-size:12px;color:var(--mut)">Lượt của</div><div style="font-size:${T.length==1?32:24}px;font-weight:800;line-height:1.2">${EMO[cur]} ${T[cur].name}</div><div style="font-size:15px;color:#f97316;margin-top:2px">${stn(T[cur])} · Hướng ${T[cur].path+1}</div>${T.length==1?`<div style="font-size:17px;font-weight:700;margin-top:4px">💰 ${T[cur].gold}${invS(T[cur])}${T[cur].shield?' · 🛡️×'+T[cur].shield:''}</div>`:''}`;$('#act').innerHTML=`<button onclick="ask(mainRes)" style="width:100%">🎯 Trả lời câu hỏi</button><button class="alt" onclick="SHQ=false;shop()" style="width:100%;margin-top:6px">🏪 Cửa hàng</button>`}}
+/* Xếp quân cờ: cùng 1 trạm -> cụm gọn (tối đa 6 quân + số tổng), không chồng lên nhau. */
+function layout(){const R=T.length<=4?11:T.length<=8?9.5:8.5,pos={},bad=[],gp={};
+ T.forEach((t,i)=>{if(phase=='route'&&i>=ri)return;const k=t.pos>M?'g':t.path+':'+t.pos;(gp[k]=gp[k]||[]).push(i)});
+ Object.values(gp).forEach(a=>{const t0=T[a[0]],n=P[t0.path].nodes[Math.min(t0.pos,M+1)],c=a.length;let sh=a;
+  if(c>6){sh=a.slice(0,6);if(a.includes(cur)&&!sh.includes(cur))sh[5]=cur;bad.push({x:n.x,y:n.y,c})}
+  const m=sh.length,rr=(c>6?2.05:[0,0,1.05,1.2,1.45,1.7,2.05][m])*R,a0=m==2?0:-Math.PI/2;
+  sh.forEach((i,j)=>{const g=a0+2*Math.PI*j/m;pos[i]=[n.x+Math.cos(g)*rr,n.y+Math.sin(g)*rr]})});
+ return{R,pos,bad}}
+function posOf(t,i){return layout().pos[i]||[0,0]}
+function render(){const g=$('#pawns'),hl=phase=='route'?ri:cur,L=layout(),R=L.R,k=R/11,few=T.length<=4;
+ let ld=-1;if(T.length>2)T.forEach((t,i)=>{if(t.pos>0&&(ld<0||t.pos>T[ld].pos||(t.pos==T[ld].pos&&t.gold>T[ld].gold)))ld=i});
+ T.forEach((t,i)=>{let e=document.getElementById('pw'+i);if(!e){g.insertAdjacentHTML('beforeend',`<g class="pawn" id="pw${i}"><title>${t.name}</title><g transform="scale(${k})"><path class="bt" d="M-17 5H17L11 15H-11Z" fill="#b45309" stroke="#fff" stroke-width="2" stroke-linejoin="round" style="display:none"/><circle r="11" fill="${COL[i]}" stroke="#fff" stroke-width="3"/><text y="5.5" font-size="14" text-anchor="middle">${EMO[i]}</text><g class="ice" style="display:none"><rect x="-15" y="-16" width="30" height="32" rx="8" fill="#bae6fd" fill-opacity=".72" stroke="#ecfeff" stroke-width="2"/><path d="M-9-9l5-3M6 7l5-3" stroke="#fff" stroke-width="2" stroke-linecap="round"/><text x="10" y="-9" font-size="11" text-anchor="middle">❄️</text></g></g>${few&&T.length>1?`<text y="-17" font-size="11" font-weight="700" text-anchor="middle" fill="#fff" stroke="#111" stroke-width="3" paint-order="stroke">${t.name}</text>`:''}<text class="cr" y="${few?-30:-R-3}" font-size="14" text-anchor="middle" style="display:none">👑</text></g>`);e=document.getElementById('pw'+i)}
+  const p=L.pos[i];if(p)e.style.transform=`translate(${p[0]}px,${p[1]}px)`;e.style.display=p?'':'none';
+  e.querySelector('.bt').style.display=t.pos>0&&P[t.path].nodes[t.pos].sea?'':'none';e.querySelector('.ice').style.display=t.frozen?'':'none';e.querySelector('.cr').style.display=i==ld?'':'none'});
+ $('#badges').innerHTML=L.bad.map(b=>`<g transform="translate(${b.x} ${b.y})"><circle r="${R}" fill="#fff" stroke="#0f172a" stroke-width="2.5"/><text y="${R*.42}" font-size="${R*1.15}" font-weight="800" text-anchor="middle" fill="#0f172a">${b.c}</text></g>`).join('');
+ let cm=$('#curmark');if(!cm){g.insertAdjacentHTML('beforeend',`<g class="pawn" id="curmark" style="pointer-events:none;display:none"><circle class="pulse" r="${R+5}" fill="none" stroke="#f97316" stroke-width="4"/><g class="cl"><rect height="17" rx="8.5" y="-1" fill="#f97316" stroke="#fff" stroke-width="2"/><text y="11.5" font-size="11.5" font-weight="800" fill="#fff" text-anchor="middle"></text></g></g>`);cm=$('#curmark')}
+ const cp=phase=='play'&&T.length>1&&L.pos[cur];
+ if(cp){cm.style.display='';cm.style.transform=`translate(${cp[0]}px,${cp[1]}px)`;const tx=cm.querySelector('text'),rc=cm.querySelector('rect'),cl=cm.querySelector('.cl');tx.innerHTML=T[cur].name;const w=tx.textContent.length*6.8+18;rc.setAttribute('x',-w/2);rc.setAttribute('width',w);cl.setAttribute('transform',`translate(0 ${-R-27})`);cl.style.display=few?'none':''}else cm.style.display='none';
+ const cmp=T.length>8,od=T.map((_,i)=>i);if(cmp)od.sort((a,b)=>T[b].pos-T[a].pos||T[b].gold-T[a].gold||a-b);
+ $('#teamList').innerHTML=od.map(i=>{const t=T[i],nr=phase=='route'&&i>=ri;return cmp?`<div class="team cp ${i==hl?'on':''}" style="border-left:6px solid ${COL[i]}"><span class="em">${EMO[i]}</span><b style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${t.name}</b>${nr?'':`<span>${t.pos>M?'🏁':t.pos+'/'+M}</span>`}<span>💰${t.gold}</span>${t.frozen?'<span>❄️</span>':''}</div>`:`<div class="team ${i==hl?'on':''}" style="border-left:7px solid ${COL[i]}"><span class="em">${EMO[i]}</span><div style="flex:1"><b>${t.name}</b> · 💰${t.gold}${invS(t)}${t.shield?' · 🛡️×'+t.shield:''}${t.frozen?' · ❄️':''}${nr?'':' · '+DIRS[t.path].a+' '+DIRS[t.path].n+' · '+stn(t)}
+  ${SOLO?'':`<small>${t.members.map(esc).join(', ')}</small>`}</div></div>`}).join('');
+ $('#teamList').style.display=T.length==1?'none':'';if(phase=='route'){$('#turn').innerHTML=`${EMO[ri]} ${T[ri].name} chọn hướng đi:`;$('#act').innerHTML=`<div class="rts">${DIRS.map((d,j)=>`<button onclick="setRoute(${j})">${d.a} ${d.n}</button>`).join('')}</div><button class="alt" onclick="randRoutes()" style="margin-top:6px;width:100%">🎲 Ngẫu nhiên</button>`}
+ else{$('#turn').innerHTML=`<div style="font-size:12px;color:var(--mut)">Lượt của</div><div style="font-size:${T.length==1?32:24}px;font-weight:800;line-height:1.2">${EMO[cur]} ${T[cur].name}</div><div style="font-size:15px;color:#f97316;margin-top:2px">${stn(T[cur])} · ${DIRS[T[cur].path].a} ${DIRS[T[cur].path].n}</div>${T.length==1?`<div style="font-size:17px;font-weight:700;margin-top:4px">💰 ${T[cur].gold}${invS(T[cur])}${T[cur].shield?' · 🛡️×'+T[cur].shield:''}</div>`:''}`;$('#act').innerHTML=`<button onclick="ask(mainRes)" style="width:100%">🎯 Trả lời câu hỏi</button><button class="alt" onclick="SHQ=false;shop()" style="width:100%;margin-top:6px">🏪 Cửa hàng</button>`}}
 function stn(t){return t.pos==0?'📍 Xuất phát':t.pos>M?'📍 Kho báu':'📍 Trạm '+t.pos+'/'+M}
 function invS(t){return Object.entries(t.inv).filter(e=>e[1]>0).map(e=>' '+ITM[e[0]][0]+'×'+e[1]).join('')}
 function shop(){const t=T[cur];modal(`<h3>🏪 Cửa hàng</h3><div style="font-weight:700;margin-bottom:6px">💰 ${t.gold} vàng</div>`+Object.entries(ITM).map(([k,v])=>`<div class="rw"><span style="font-size:28px;flex:0 0 40px">${v[0]}</span><span><b>${v[1]}</b><br><small>Vượt ${v[3]}${SHQ&&DQ&&DQ.dn.d[2].includes(k)?' <b style="color:var(--okc)">· dùng được ở đây</b>':''}</small></span><span style="flex:0 0 60px">Có: ${t.inv[k]||0}</span><button ${t.gold<v[2]?'disabled style="opacity:.5"':''} onclick="buy('${k}')">${v[2]}💰</button></div>`).join('')+`<button class="alt" onclick="${SHQ?'backQ()':'close_();render()'}" style="margin-top:8px">${SHQ?'⬅ Quay lại câu hỏi':'Đóng'}</button>`)}
@@ -448,6 +479,7 @@ function openAdmin(){
  <div class="frow"><label>Chế độ <select id="sM"><option value="online">Online – nhiều người cùng chơi, xếp hạng</option><option value="offline">Offline – bài tập về nhà, báo cáo cá nhân</option></select></label>
  <label>Thời hạn (phút) <input id="sD" type="number" min="1" value="45"></label></div>
  <p style="margin:6px 0"><span class="qc" style="margin:0">❓ ${nq} câu hỏi</span>${INF('Câu hỏi lấy từ file đã nạp.\nSố hướng đi/trạm theo cài đặt hiện tại.\nHết thời hạn, mã tự vô hiệu.')}</p>
+ <label class="chk"><input type="checkbox" id="sL" checked> 👀 Người chơi xem nhau di chuyển (Online)</label>
  <p class="err" id="sE"></p>
  <div class="btns"><button id="sB" onclick="mkSes()">Tạo mã lượt</button><button class="alt" onclick="repList()">📊 Xem báo cáo</button><button class="alt" onclick="bye()">Đóng</button></div>`)}
 async function mkSes(){
@@ -455,7 +487,7 @@ async function mkSes(){
  if(!ok.length)return er('Chưa có câu hỏi hợp lệ.');
  const q=JSON.parse(JSON.stringify(ok));q.forEach(o=>{for(const k of['image','preImage'])if(/^data:/.test(o[k]||''))o[k]=''});
  const mins=Math.max(1,+$('#sD').value||45),code=ID(5),now=Date.now(),on=$('#sM').value=='online';
- const s={code,title:$('#sT').value||code,mode:$('#sM').value,start:now,status:on?'waiting':'running',dur:mins,end:now+(on?120:mins)*60000,k:+$('#kPaths').value,m:Math.max(1,+$('#mSt').value||5),q:JSON.stringify(q),admin:ME,nq:q.length};
+ const s={code,title:$('#sT').value||code,mode:$('#sM').value,start:now,status:on?'waiting':'running',dur:mins,end:now+(on?120:mins)*60000,k:+$('#kPaths').value,m:Math.max(1,+$('#mSt').value||5),q:JSON.stringify(q),admin:ME,nq:q.length,seed:Math.random()*2147483647|0,pt:$('#pType').value,live:$('#sL').checked};
  er('');if(bt){bt.disabled=true;bt.textContent='Đang tạo…'}
  try{await store.put('sessions',code,s)}catch(e){if(bt){bt.disabled=false;bt.textContent='Tạo mã lượt'}return er('⚠️ Không tạo được mã: '+e.message)}
  if(on)return ctl(code);
@@ -483,7 +515,7 @@ async function doJoin(){
  const s=await store.get('sessions/'+code);if(!s)return er('Mã không đúng.');
  if(Date.now()>s.end)return er('🔒 Mã đã hết hạn ('+fmt(s.end)+').');
  if(Date.now()<s.start)return er('Lượt chưa bắt đầu.');
- SES=s;PLY={id:ME,name:nm,ok:0,bad:0,gold:0,done:false,log:[],av:AVSEL};
+ window.SEED=s.seed==null?null:s.seed;if(s.pt&&$('#pType'))$('#pType').value=s.pt;SES=s;PLY={id:ME,name:nm,ok:0,bad:0,gold:0,done:false,log:[],av:AVSEL};
  CUR=JSON.parse(s.q);Q=CUR.map(norm).filter(Boolean);
  $('#kPaths').value=s.k;$('#mSt').value=s.m;$('#mode').value='single';$('#names').value=nm;pools=[];
  await FIN();bye();if(s.mode=='online'&&s.status!='running')return waitStart(code);start();
@@ -493,11 +525,43 @@ window.SYNC=(q,o)=>{if(!SES||!PLY)return;if(Date.now()>SES.end){FIN();return}
 window.FIN=async d=>{if(!SES||!PLY)return;if(d)PLY.done=true;if(T[0])PLY.gold=T[0].gold;if(Date.now()>SES.end+60000)return;
  try{await store.put('results',SES.code+'_'+PLY.id,{...PLY,code:SES.code})}catch(e){}};
 let CT=null;
-async function ctl(code){clearInterval(CT);let first=true;const draw=async()=>{if(!first&&!$('#ctlm')){clearInterval(CT);return}let s,R0;try{s=await store.get('sessions/'+code);if(!s)throw Error('Không tìm thấy mã vừa tạo.');R0=await store.list('results',['code',code])}catch(e){if(first){first=false;clearInterval(CT);modal('<h3>⚠️ Đã tạo mã '+code+' nhưng không mở được phòng</h3><p class="err">'+esc(e.message)+'</p><div class="btns"><button class="alt" onclick="openAdmin()">Quay lại</button></div>')}return}if(!first&&!$('#ctlm')){clearInterval(CT);return}first=false;const R=R0,run=s.status=='running',left=Math.max(0,s.end-Date.now()),rk=[...R].sort((a,b)=>(b.done-a.done)||(b.gold-a.gold)||(b.ok-a.ok)).slice(0,8);
- modal(`<div id="ctlm"><h3>🎛️ ${esc(s.title)}</h3><div class="code">${code}</div><p style="margin:4px 0">${INF('Người chơi mở link trang người chơi (không phải trang admin), nhập mã và tên.')}</p><p><b>${R.length}</b> người trong phòng:</p><div>${R.map(r=>`<span class="chip">${r.av||'🙂'} ${esc(r.name)}</span>`).join('')||'<i>Chưa có ai</i>'}</div>${!run?`<p><button onclick="startSes('${code}')" style="font-size:20px">▶ Bắt đầu cho tất cả</button></p>`:`<p>${left?`🟢 Đang chơi · còn <b>${Math.floor(left/60000)}:${String(Math.floor(left/1000)%60).padStart(2,'0')}</b>`:'🔒 Đã kết thúc'}</p><table class="sb">${rk.map((r,i)=>`<tr><td>${i+1}</td><td>${esc(r.name)}</td><td>${r.gold} vàng</td><td>${r.ok}/${r.ok+r.bad}</td><td>${r.done?'✅':''}</td></tr>`).join('')}</table>`}<p><button class="alt" onclick="clearInterval(CT);rep('${code}')">📊 Báo cáo đầy đủ</button> <button class="alt" onclick="bye()">Đóng</button></p></div>`)};CT=setInterval(draw,3000);draw()}
+async function ctl(code){clearInterval(CT);let first=true;const draw=async()=>{if(!first&&!$('#ctlm')){clearInterval(CT);return}let s,R0;try{s=await store.get('sessions/'+code);if(!s)throw Error('Không tìm thấy mã vừa tạo.');R0=await store.list('results',['code',code])}catch(e){if(first){first=false;clearInterval(CT);modal('<h3>⚠️ Đã tạo mã '+code+' nhưng không mở được phòng</h3><p class="err">'+esc(e.message)+'</p><div class="btns"><button class="alt" onclick="openAdmin()">Quay lại</button></div>')}return}if(!first&&!$('#ctlm')){clearInterval(CT);return}first=false;const R=R0,run=s.status=='running',left=Math.max(0,s.end-Date.now()),rk=[...R].sort((a,b)=>(b.done-a.done)||(b.gold-a.gold)||(b.ok-a.ok));
+ const nd=R.filter(r=>r.done).length,md=['🥇','🥈','🥉'],y=($('#ctlsc')||{}).scrollTop||0,
+  tm=left?Math.floor(left/60000)+':'+String(Math.floor(left/1000)%60).padStart(2,'0'):'';
+ modal(`<div id="ctlm"><div class="code">${code}</div>${INF('Người chơi mở link trang người chơi (không phải trang admin), nhập mã và tên.')}
+<div style="margin:8px 0"><span class="qc" style="margin:0">👥 ${R.length} người</span>${run?` <span class="qc" style="margin:0">✅ ${nd}/${R.length} về đích</span> <span class="qc" style="margin:0">${left?'⏱ còn '+tm:'🔒 Đã kết thúc'}</span>`:''}</div>
+${!run?`<p style="margin:8px 0"><button onclick="startSes('${code}')" style="font-size:20px">▶ Bắt đầu cho tất cả</button></p><div class="scr" id="ctlsc">${R.map(r=>`<span class="chip">${r.av||'🙂'} ${esc(r.name)}</span>`).join('')||'<i>Chưa có ai</i>'}</div>`
+:`<div class="scr" id="ctlsc"><table class="sb"><tr><th>#</th><th>Người chơi</th><th>Vàng</th><th>Đúng</th><th></th></tr>${rk.map((r,i)=>`<tr><td>${md[i]||i+1}</td><td>${r.av||''} ${esc(r.name)}</td><td>${r.gold}</td><td>${r.ok}/${r.ok+r.bad}</td><td>${r.done?'✅':''}</td></tr>`).join('')}</table></div>`}
+<div class="btns"><button class="alt" onclick="clearInterval(CT);rep('${code}')">📊 Báo cáo đầy đủ</button><button class="alt" onclick="bye()">Đóng</button></div></div>`);const sc=$('#ctlsc');if(sc)sc.scrollTop=y};CT=setInterval(draw,3000);draw()}
 async function startSes(code){const s=await store.get('sessions/'+code);s.status='running';s.startAt=Date.now();s.end=s.startAt+s.dur*60000;await store.set('sessions/'+code,s);ctl(code)}
 function armEnd(){clearInterval(window.ENDT);window.ENDT=setInterval(()=>{if(Date.now()>SES.end){clearInterval(ENDT);FIN();modal('<div class="big">⏰</div><h3>Hết giờ! Lượt chơi đã đóng.</h3>'+sumH()+'<button onclick="location.reload()">Thoát</button>')}},3000)}
 function waitStart(code){const draw=async()=>{const s=await store.get('sessions/'+code);if(!s)return;if(s.status=='running'){clearInterval(window.WT);SES=s;bye();start();armEnd();return}const R=await store.list('results',['code',code]);modal(`<div class="big">⏳</div><h3>Xin chào ${esc(PLY.name)} ${PLY.av}</h3><p>Đang chờ admin bấm Bắt đầu…</p><p class="hint">${R.length} người trong phòng</p>${R.map(r=>`<span class="chip">${r.av||''} ${esc(r.name)}</span>`).join('')}`)};window.WT=setInterval(draw,2000);draw()}
+
+/* ===== XEM ĐỐI THỦ DI CHUYỂN (online) ===== */
+let LIVE={},LP=null;window.LVT=null;
+const liveOn=()=>SES&&PLY&&SES.mode=='online'&&SES.live!==false&&T[0];
+async function pollLive(){if(!liveOn())return;if(Date.now()>SES.end+5000){clearInterval(window.LVT);return}
+ try{LIVE=(await fb('live/'+SES.code))||{}}catch(e){return}drawGhosts()}
+function livePush(){if(!liveOn())return;clearTimeout(LP);LP=setTimeout(()=>{if(Date.now()>SES.end+60000)return;
+ fb('live/'+SES.code+'/'+PLY.id,'PUT',{n:PLY.name,a:PLY.av,p:T[0].path,s:T[0].pos,g:T[0].gold}).catch(()=>{})},500)}
+function drawGhosts(){if(!liveOn()||!P.length||!$('#pawns'))return;
+ let gh=$('#ghosts');if(!gh){$('#pawns').insertAdjacentHTML('beforebegin','<g id="ghosts"></g>');gh=$('#ghosts')}
+ const me=PLY.id,L=Object.entries(LIVE).filter(([id,v])=>id!=me&&v&&typeof v.s=='number').map(([id,v])=>({id,...v})).sort((a,b)=>(b.s-a.s)||(b.g-a.g));
+ const all=[...L,{id:me,n:PLY.name,a:PLY.av,p:T[0].path,s:T[0].pos,g:T[0].gold,me:1}].sort((a,b)=>(b.s-a.s)||(b.g-a.g)),lead=all[0].id;
+ const grp={},more={},keep=new Set(),OFF=[0,1,2,3,4,5].map(q=>[21*Math.cos(q*Math.PI/3-Math.PI/2),21*Math.sin(q*Math.PI/3-Math.PI/2)]);
+ L.forEach(v=>{const pi=Math.min(Math.max(0,v.p|0),P.length-1),nd=P[pi].nodes,si=Math.min(Math.max(0,v.s|0),nd.length-1),n=nd[si],k=(si==0||si==nd.length-1)?'e'+si:pi+':'+si,c=grp[k]=(grp[k]||0)+1;
+  if(c>OFF.length){const m=more[k]=more[k]||{x:n.x,y:n.y,c:0};m.c++;return}
+  const id='gh'+v.id,tr=`translate(${n.x+OFF[c-1][0]}px,${n.y+OFF[c-1][1]}px)`;keep.add(id);
+  let e=document.getElementById(id);
+  if(!e){gh.insertAdjacentHTML('beforeend',`<g class="pawn" id="${id}" style="transform:${tr}"><title></title><circle r="9" fill="#e2e8f0" stroke="#64748b" stroke-width="2"/><text y="4" font-size="11" text-anchor="middle"></text><text y="-12" font-size="12" text-anchor="middle"></text></g>`);e=document.getElementById(id)}
+  e.style.transform=tr;e.querySelector('title').textContent=v.n+' · '+(v.s>M?'Về đích':'Trạm '+v.s+'/'+M)+' · '+v.g+' vàng';
+  const tx=e.querySelectorAll('text');tx[0].textContent=v.a||'🙂';tx[1].textContent=v.id==lead?'👑':''});
+ gh.querySelectorAll('.pawn').forEach(e=>{if(!keep.has(e.id))e.remove()});gh.querySelectorAll('.mr').forEach(e=>e.remove());
+ Object.values(more).forEach(m=>gh.insertAdjacentHTML('beforeend',`<g class="mr"><circle cx="${m.x+30}" cy="${m.y-24}" r="9" fill="#f97316" stroke="#fff" stroke-width="2"/><text x="${m.x+30}" y="${m.y-20}" font-size="10" font-weight="800" text-anchor="middle" fill="#fff">+${m.c}</text></g>`));
+ let bx=$('#liveBox');if(!bx){$('#teamList').insertAdjacentHTML('afterend','<div class="card" id="liveBox" style="font-size:13px"></div>');bx=$('#liveBox')}
+ const myi=all.findIndex(v=>v.me),md=['🥇','🥈','🥉'],row=(v,i)=>`<div style="display:flex;gap:6px;align-items:center;padding:2px 4px;border-radius:8px;${v.me?'background:rgba(249,115,22,.22);font-weight:800':''}"><span style="width:22px">${md[i]||i+1}</span><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(v.a||'')} ${esc(v.n||'')}</span><span>${v.s>M?'🏆':'📍'+v.s+'/'+M}</span></div>`;
+ bx.innerHTML=`<b>🏁 Đua cùng ${L.length} bạn · Bạn hạng ${myi+1}/${all.length}</b>${all.slice(0,5).map(row).join('')}${myi>=5?'<div style="text-align:center">⋮</div>'+row(all[myi],myi):''}`}
+(function(){const r0=render;render=function(){r0();if(liveOn()){livePush();if(!window.LVT){window.LVT=setInterval(pollLive,3000);pollLive()}drawGhosts()}}})();
 const ADM=window.APPMODE=='admin';
 function lobby(msg){$('.setup').style.display='none';
  $('#setup').insertAdjacentHTML('beforeend','<div class="card" id="lobc" style="max-width:420px;margin:8vh auto;text-align:center">'+(msg?'<h2>🔒 '+msg+'</h2>':'<h1 style="color:#0369a1;text-shadow:none">🏝️ Truy Tìm Kho Báu</h1><input class="fld" id="jC" placeholder="NHẬP MÃ GAME" maxlength="5" style="text-transform:uppercase;text-align:center;font-size:24px;padding:12px 10px;line-height:1.5"><p id="jE" style="color:var(--badc);font-weight:700;min-height:1.2em"></p><button onclick="codeNext()" style="width:100%;font-size:20px">Tiếp tục</button><p style="margin:12px 0 0"><a href="admin.html" class="hint" style="text-decoration:underline">🔑 Đăng nhập</a></p>')+'</div>');
