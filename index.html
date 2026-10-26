@@ -112,7 +112,7 @@ select:disabled{opacity:1;color:var(--ink);-webkit-text-fill-color:var(--ink)}
 <div id="gamev" style="display:none"><div class="game"><div class="mapw"><svg id="map" viewBox="0 0 800 600"></svg></div>
 <div class="side"><div id="teamList"></div>
  <div class="card"><div id="turn" style="font-weight:700;margin-bottom:6px"></div><div id="act"></div><div id="log"></div></div>
- <button class="alt" id="mus" onclick="toggleMusic()">🎵 Nhạc: Bật</button><button class="alt" onclick="location.reload()">↺ Cài đặt lại</button><details class="card" id="guide" style="font-size:13px;line-height:1.5"><summary style="font-weight:800;cursor:pointer">📖 Hướng dẫn cách chơi</summary><ol style="margin:6px 0 0;padding-left:18px"><li><b>Mục tiêu:</b> về đích 💰 kho báu trước.</li><li>Đến lượt, bấm <b>🎯 Trả lời câu hỏi</b>. Đúng: +50 vàng, tiến 1 trạm và mở 1 rương. Sai: mất lượt.</li><li><b>Rương</b> có thể là vàng, nhân đôi hoặc mất nửa vàng, rương rỗng, hoặc năng lực: 🛡️ vượt nguy hiểm, 🚀 tiến thêm 1 trạm, ❄️ đóng băng đối phương.</li><li><b>Chướng ngại</b> (🕳️ 🌲 🐍 🌊 🔥…): dùng đúng vật dụng hoặc trả lời đúng câu hỏi để vượt. Vượt xong, tại trạm phải trả lời thêm 1 câu: đúng mới mở rương, sai thì trả lời lại. Không vượt được thì đứng yên.</li><li><b>🏪 Cửa hàng:</b> dùng vàng mua vật dụng (🏹 🦺 🌉 🧭 🛶 🥾), có thể mở ngay khi gặp chướng ngại.</li></ol></details></div></div></div>
+ <button class="alt" id="mus" onclick="toggleMusic()">🎵 Nhạc: Bật</button><button class="alt" onclick="endAsk()" style="background:#ef4444;box-shadow:0 3px 0 #b91c1c">🏁 Kết thúc game</button><button class="alt" onclick="location.reload()">↺ Cài đặt lại</button><details class="card" id="guide" style="font-size:13px;line-height:1.5"><summary style="font-weight:800;cursor:pointer">📖 Hướng dẫn cách chơi</summary><ol style="margin:6px 0 0;padding-left:18px"><li><b>Mục tiêu:</b> về đích 💰 kho báu trước.</li><li>Đến lượt, bấm <b>🎯 Trả lời câu hỏi</b>. Đúng: +50 vàng, tiến 1 trạm và mở 1 rương. Sai: mất lượt.</li><li><b>Rương</b> có thể là vàng, nhân đôi hoặc mất nửa vàng, rương rỗng, hoặc năng lực: 🛡️ vượt nguy hiểm, 🚀 tiến thêm 1 trạm, ❄️ đóng băng đối phương.</li><li><b>Chướng ngại</b> (🕳️ 🌲 🐍 🌊 🔥…): dùng đúng vật dụng hoặc trả lời đúng câu hỏi để vượt. Vượt xong, tại trạm phải trả lời thêm 1 câu: đúng mới mở rương, sai thì trả lời lại. Không vượt được thì đứng yên.</li><li><b>🏪 Cửa hàng:</b> dùng vàng mua vật dụng (🏹 🦺 🌉 🧭 🛶 🥾), có thể mở ngay khi gặp chướng ngại.</li></ol></details></div></div></div>
 <div id="modal"><div class="box" id="mbox"></div></div>
 
 <script>
@@ -308,6 +308,11 @@ function useItem(k){const t=T[cur];if(!t.inv[k]||!RCB)return;t.inv[k]--;IU=ITM[k
 const W=t=>T.length>1?t.name:'Bạn';
 function log(m){const l=$('#log');l.innerHTML=`<div>• ${m}</div>`+l.innerHTML}
 function modal(h){$('#mbox').innerHTML=h;$('#modal').style.display='flex'}
+function endAsk(){modal(`<div class="big">🏁</div><h3>Kết thúc game?</h3><p>Trò chơi sẽ dừng lại và hiển thị kết quả hiện tại.</p><button onclick="endGame()">🏁 Kết thúc</button> <button class="alt" onclick="close_()">↩ Chơi tiếp</button>`)}
+function endGame(){window.FIN&&FIN();try{typeof AC!='undefined'&&AC&&AC.state=='running'&&AC.suspend()}catch(e){}
+const md=['🥇','🥈','🥉'],R=T.map((t,i)=>({t,i})).sort((a,b)=>b.t.pos-a.t.pos||b.t.gold-a.t.gold),
+rk=SOLO?'':`<div style="text-align:left;margin:10px 0">${R.map((r,k)=>`<div class="rw"><span>${md[k]||(k+1)+'.'} ${EMO[r.i]} <b>${esc(r.t.name)}</b> <small>${stn(r.t)}</small></span><b>💰 ${r.t.gold}</b></div>`).join('')}</div>`;
+modal(`<div class="big">🏁</div><h2>Game đã kết thúc</h2>${SOLO?`<p style="font-size:20px;font-weight:700">${EMO[0]} ${esc(T[0].name)} · ${stn(T[0])}</p><p>💰 ${T[0].gold} vàng</p>`:rk}<p>Đúng ${ST.ok}/${ST.ok+ST.bad} câu</p>${sumH()}<button onclick="location.reload()">Chơi lại</button>`)}
 function close_(){$('#modal').style.display='none'}
 function info(h,f){NX=f;modal(h+`<button onclick="NX()">Tiếp tục</button>`)}
 function nextTurn(){close_();while(true){cur=(cur+1)%T.length;if(T[cur].frozen){T[cur].frozen=false;log(`❄️ ${W(T[cur])} bị đóng băng, mất lượt`);continue}break}render()}
