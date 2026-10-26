@@ -57,7 +57,36 @@ select:disabled{opacity:1;color:var(--ink);-webkit-text-fill-color:var(--ink)}
 #modal .hint{font-size:15px}.imgerr{display:block;font-size:14px;color:var(--badc);margin:4px 0;word-break:break-all}
 .area{padding:12px 16px;margin:8px 0;border-radius:14px;background:rgba(14,165,233,.14);border:2px solid rgba(14,165,233,.45)}
 .area select,.qr select{background:var(--card);border:2px solid #0ea5e9;font-size:18px}
-</style><style>.sb{width:100%;border-collapse:collapse;font-size:15px;text-align:left}.sb td,.sb th{padding:5px 6px;border-bottom:1px solid var(--line)}.bar{height:10px;border-radius:6px;background:#ef4444}.fld{display:block;width:100%;margin:4px 0}.code{font-size:34px;letter-spacing:6px;font-weight:800;color:#0369a1}</style></head><body>
+</style><style>.sb{width:100%;border-collapse:collapse;font-size:15px;text-align:left}.sb td,.sb th{padding:5px 6px;border-bottom:1px solid var(--line)}.bar{height:10px;border-radius:6px;background:#ef4444}.fld{display:block;width:100%;margin:4px 0}.code{font-size:34px;letter-spacing:6px;font-weight:800;color:#0369a1}</style><style>
+/* ===== Giao diện admin (phóng to, gọn, ghi chú thu vào biểu tượng) ===== */
+.inf{flex:0 0 auto;width:30px;height:30px;padding:0;margin:0 0 0 6px;border-radius:50%;font:italic 800 17px/30px Georgia,serif;text-align:center;background:rgba(14,165,233,.18);color:#0ea5e9;box-shadow:none;border:2px solid rgba(14,165,233,.55);vertical-align:middle}
+.inf:hover{background:#0ea5e9;color:#fff}.inf:active{transform:none;box-shadow:none}
+#infpop{position:fixed;z-index:200;background:#0f172a;color:#f1f5f9;border:1px solid #334155;border-radius:14px;padding:14px 16px;font-size:16px;line-height:1.6;box-shadow:0 12px 32px rgba(0,0,0,.45);white-space:pre-line;text-align:left}
+.sh{display:flex;align-items:center;gap:12px;margin-bottom:18px}.sh h2{margin:0;font-size:clamp(20px,2.2vw,26px);flex:1}
+.num{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#f97316,#fb923c);color:#fff;display:grid;place-items:center;font-weight:800;font-size:19px;box-shadow:0 3px 0 #c2410c}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px}
+.qc{display:inline-block;margin:0 0 14px;padding:6px 14px;border-radius:999px;background:rgba(14,165,233,.16);font-weight:700;font-size:15px}.qc:empty{display:none}
+.cta{grid-column:1/-1;font-size:clamp(20px,2.4vw,26px)!important;padding:20px 24px!important;border-radius:20px!important;background:linear-gradient(135deg,#0ea5e9,#2563eb)!important;box-shadow:0 6px 0 #1e40af!important}
+.adm #setup{padding:clamp(14px,3vw,44px)}
+.adm .setup{max-width:1180px;gap:clamp(14px,2vw,26px);grid-template-columns:1fr 1fr}
+@media(max-width:860px){.adm .setup{grid-template-columns:1fr}}
+.adm h1{text-align:center;font-size:clamp(30px,4vw,48px);margin:6px 0 10px}
+.adm .card{border-radius:22px;padding:clamp(18px,2.4vw,30px);box-shadow:0 14px 40px rgba(0,0,0,.28)}
+.adm label{font-size:15px;display:flex;flex-direction:column;gap:7px;color:var(--mut)}
+.adm select,.adm input:not([type=checkbox]):not([type=file]){font-size:18px;padding:12px 14px;border:2px solid var(--line);border-radius:14px;width:100%}
+.adm select:focus,.adm input:focus{outline:none;border-color:#0ea5e9;box-shadow:0 0 0 4px rgba(14,165,233,.25)}
+.adm .fl{margin:0 0 14px}
+.adm input[type=file]{width:100%;padding:10px;border:2px dashed #0ea5e9;border-radius:14px;background:rgba(14,165,233,.08);font-size:16px;color:var(--ink)}
+.adm input[type=file]::file-selector-button{font:inherit;font-weight:700;border:0;border-radius:10px;padding:9px 16px;margin-right:12px;cursor:pointer;background:#0ea5e9;color:#fff}
+.adm label.chk{flex-direction:row;align-items:center;gap:10px;font-size:16px;color:var(--ink)}
+.adm .chk input{width:22px;height:22px;padding:0}
+.adm #modal .box{border-radius:26px;padding:clamp(20px,3vw,36px)}
+.frow{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin:12px 0;text-align:left}
+.err{color:var(--badc);font-weight:700;min-height:1.3em;margin:8px 0}
+.btns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:12px}
+.adm .btns button{font-size:18px;padding:12px 24px}
+</style>
+</head><body>
 
 <div id="setup"><div class="setup">
  <div style="grid-column:1/-1"><h1>🏝️ Truy Tìm Kho Báu</h1></div>
@@ -397,11 +426,18 @@ async function fbRefresh(){if(!RT)return fbAuth();const r=await fetch('https://s
  if(!r.ok)return fbAuth();TOK=j.id_token;RT=j.refresh_token}
 async function fb(p,m,b,again){if(!TOK)await fbAuth();
  const r=await fetch(CFG.databaseURL.replace(/\/$/,'')+'/'+p+'.json?auth='+TOK,{method:m||'GET',headers:{'Content-Type':'application/json'},body:b===undefined?undefined:JSON.stringify(b)});
- if(r.status==401&&!again){await fbRefresh();return fb(p,m,b,1)}if(!r.ok)throw Error('Database '+r.status);return r.json()}
+ if(r.status==401&&!again){await fbRefresh();return fb(p,m,b,1)}if(!r.ok){let m='';try{const j=await r.json();m=j&&j.error||''}catch(e){}throw Error(r.status==401||r.status==403?'Không có quyền truy cập dữ liệu ('+(m||r.status)+'). Kiểm tra Rules của Realtime Database và việc đăng nhập.':r.status==404?'Không tìm thấy Realtime Database (kiểm tra databaseURL).':'Database '+r.status+(m?': '+m:''))}return r.json()}
 const store={
  get:p=>fb(p),set:(p,d)=>fb(p,'PUT',d),
  put(c,id,d){const i=id.indexOf('_');return fb(c=='results'?'results/'+id.slice(0,i)+'/'+id.slice(i+1):c+'/'+id,'PUT',d)},
  async list(c,w){const o=await fb(c=='results'?'results/'+w[1]:c)||{};return Object.entries(o).map(([id,v])=>({id,...v}))}};
+const INF=t=>`<button type="button" class="inf" data-i="${esc(t)}" aria-label="Ghi chú">i</button>`;
+document.addEventListener('click',e=>{const old=document.getElementById('infpop'),b=e.target.closest&&e.target.closest('.inf');
+ if(old){old.remove();if(b&&old._b===b)return}if(!b)return;
+ const p=document.createElement('div');p.id='infpop';p.textContent=b.dataset.i;p._b=b;document.body.appendChild(p);
+ const r=b.getBoundingClientRect(),w=Math.min(380,innerWidth-24);p.style.width=w+'px';
+ p.style.left=Math.min(Math.max(12,r.left+r.width/2-w/2),innerWidth-w-12)+'px';
+ let t=r.bottom+8;p.style.top=t+'px';const h=p.offsetHeight;if(t+h>innerHeight-8)p.style.top=Math.max(8,r.top-h-8)+'px'});
 const ID=n=>Array.from({length:n},()=>'ABCDEFGHJKMNPQRSTUVWXYZ23456789'[Math.random()*31|0]).join('');
 const fmt=t=>new Date(t).toLocaleString('vi-VN');
 const bye=()=>{clearInterval(CT);clearInterval(window.WT);$('#modal').style.display='none'};
@@ -460,7 +496,7 @@ function armEnd(){clearInterval(window.ENDT);window.ENDT=setInterval(()=>{if(Dat
 function waitStart(code){const draw=async()=>{const s=await store.get('sessions/'+code);if(!s)return;if(s.status=='running'){clearInterval(window.WT);SES=s;bye();start();armEnd();return}const R=await store.list('results',['code',code]);modal(`<div class="big">⏳</div><h3>Xin chào ${esc(PLY.name)} ${PLY.av}</h3><p>Đang chờ admin bấm Bắt đầu…</p><p class="hint">${R.length} người trong phòng</p>${R.map(r=>`<span class="chip">${r.av||''} ${esc(r.name)}</span>`).join('')}`)};window.WT=setInterval(draw,2000);draw()}
 const ADM=window.APPMODE=='admin';
 function lobby(msg){$('.setup').style.display='none';
- $('#setup').insertAdjacentHTML('beforeend','<div class="card" id="lobc" style="max-width:420px;margin:8vh auto;text-align:center">'+(msg?'<h2>🔒 '+msg+'</h2>':'<h1 style="color:#0369a1;text-shadow:none">🏝️ Truy Tìm Kho Báu</h1><p class="hint">Nhập mã game do quản trò cung cấp</p><input class="fld" id="jC" placeholder="NHẬP MÃ GAME" maxlength="5" style="text-transform:uppercase;text-align:center;font-size:24px"><p id="jE" style="color:var(--badc);font-weight:700;min-height:1.2em"></p><button onclick="codeNext()" style="width:100%;font-size:20px">Tiếp tục</button><p style="margin:12px 0 0"><a href="admin.html" class="hint" style="text-decoration:underline">🔑 Đăng nhập</a></p>')+'</div>');
+ $('#setup').insertAdjacentHTML('beforeend','<div class="card" id="lobc" style="max-width:420px;margin:8vh auto;text-align:center">'+(msg?'<h2>🔒 '+msg+'</h2>':'<h1 style="color:#0369a1;text-shadow:none">🏝️ Truy Tìm Kho Báu</h1><input class="fld" id="jC" placeholder="NHẬP MÃ GAME" maxlength="5" style="text-transform:uppercase;text-align:center;font-size:24px;padding:12px 10px;line-height:1.5"><p id="jE" style="color:var(--badc);font-weight:700;min-height:1.2em"></p><button onclick="codeNext()" style="width:100%;font-size:20px">Tiếp tục</button><p style="margin:12px 0 0"><a href="admin.html" class="hint" style="text-decoration:underline">🔑 Đăng nhập</a></p>')+'</div>');
  const c=$('#jC');if(c){c.onkeydown=e=>{if(e.key=='Enter')codeNext()};c.focus()}}
 async function codeNext(){const code=$('#jC').value.trim().toUpperCase(),er=m=>$('#jE').textContent=m;if(!code)return er('Nhập mã game.');er('Đang kiểm tra…');
  try{const s=await store.get('sessions/'+code);if(!s)return er('Mã không đúng.');if(Date.now()>s.end)return er('🔒 Mã đã hết hạn.');
