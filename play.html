@@ -99,7 +99,7 @@ select:disabled{opacity:1;color:var(--ink);-webkit-text-fill-color:var(--ink)}
   <b style="display:block;margin-top:10px">2. Câu hỏi</b> <span id="qcount" class="hint"></span>
   <div class="row"><input type="file" id="file" accept=".xlsx,.xls,.csv,.json"></div>
   <div class="row"><label class="hint"><input type="checkbox" id="onlyYes" checked> Chỉ dùng câu đánh dấu “Có”</label><label class="hint">Thư mục ảnh: <input type="file" id="imgdir" webkitdirectory multiple></label></div>
-  <div class="hint" style="margin-top:6px">Excel: A câu hỏi, B–E đáp án A–D, F đáp án đúng (A–D hoặc 1–4), G link hình. Hỗ trợ ngân hàng Spark (cột “Dữ liệu JSON”): single, multiple, list, matching, classify, classify2, ordering, position, imagepoint, dragfill, selectfill. Ảnh: để thư mục image/ cạnh file HTML hoặc bấm “Thư mục ảnh”. Dùng 1 người: chọn “1 người chơi”. Hình đặt trong thư mục (vd. image/…) cùng cấp với file HTML. Chưa nạp file thì dùng câu mẫu.</div></div>
+  <div class="hint" style="margin-top:6px">Excel: A câu hỏi, B–E đáp án A–D, F đáp án đúng (A–D hoặc 1–4), G link hình. Hỗ trợ ngân hàng Spark (cột “Dữ liệu JSON”): single, multiple, list, matching, classify, classify2, ordering, position, imagepoint, dragfill, selectfill. Ảnh: mặc định lấy từ repo chung tinhoc247/ic3-images (đường dẫn image/xxx.png), hoặc bấm “Thư mục ảnh” để dùng ảnh trên máy. Dùng 1 người: chọn “1 người chơi”. Hình đặt trong thư mục (vd. image/…) cùng cấp với file HTML. Chưa nạp file thì dùng câu mẫu.</div></div>
  <div class="card"><b id="ptitle">3. Người chơi (mỗi dòng 1 tên)</b><div class="row"><label>Hình thức <select id="mode" onchange="modeCh()"><option value="team">Theo đội</option><option value="solo">Cá nhân (nhiều người)</option><option value="single">1 người chơi (Single)</option></select></label><label id="ntw">Số đội <input id="nTeams" type="number" min="2" max="8" value="4" style="width:56px"></label></div>
   <textarea id="names" placeholder="Nguyễn Văn A&#10;Trần Thị B&#10;..."></textarea>
   <div id="avrow" style="display:none;margin-top:6px"><b style="font-size:13px">Chọn nhân vật:</b><div class="avs"></div></div>
@@ -172,8 +172,10 @@ $('#onlyYes').onchange=()=>RAW&&reload();
 $('#file').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{if(/\.json$/i.test(f.name)){const j=JSON.parse(await f.text());RAW={json:Array.isArray(j)?j:j.questions||[]}}else{if(!window.XLSX)throw Error('Không tải được thư viện Excel');const wb=XLSX.read(await f.arrayBuffer());RAW={rows:XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1})}}reload()}catch(err){alert('Lỗi file: '+err.message)}};
 $('#imgdir').onchange=e=>{[...e.target.files].forEach(f=>{const u=URL.createObjectURL(f),n=f.name.toLowerCase(),b='~'+n.replace(/\.[^.]+$/,'');IM[n]=u;IM[b]=IM[b]||u});alert('Đã nạp '+e.target.files.length+' tệp ảnh')};
 {SK=0;const d=DEFRAW.map(norm).filter(Boolean);if(d.length)Q=d;cnt()}
+const IMG_BASE='https://cdn.jsdelivr.net/gh/tinhoc247/ic3-images@main/';
+function repoUrl(s){s=String(s||'').trim().replace(/\\/g,'/').replace(/^\.?\//,'');if(!/^image\//i.test(s))s='image/'+s.split('/').pop();return IMG_BASE+encodeURI(s)}
 function nm(s){let f=String(s).split(/[\\/]/).pop();try{f=decodeURIComponent(f)}catch(e){}return f.toLowerCase()}
-function rs(s){if(!s||/^(data:|https?:|blob:)/.test(s))return s;if(/^lib:/.test(s))return IM['~'+s]||'data:image/gif;base64,R0lGODlhAQABAAAAACw=';const f=nm(s);return IM[f]||IM['~'+f.replace(/\.[^.]+$/,'')]||(HW.base?HW.base.replace(/\/?$/,'/')+s:s)}
+function rs(s){if(!s||/^(data:|https?:|blob:)/.test(s))return s;if(/^lib:/.test(s))return IM['~'+s]||'data:image/gif;base64,R0lGODlhAQABAAAAACw=';const f=nm(s);return IM[f]||IM['~'+f.replace(/\.[^.]+$/,'')]||(HW.base?HW.base.replace(/\/?$/,'/')+s:repoUrl(s))}
 function imgH(s,c){return s?`<img class="${c||'qimg'}" src="${esc(rs(s))}" data-s="${esc(s)}" alt="" onerror="imgErr(this)" onclick="this.classList.toggle('zoom')">`:''}
 async function preImgs(s){const r=[...new Set(String(s||'').match(/lib:[A-Za-z0-9]+:i\d+/g)||[])].filter(k=>!IM['~'+k]);
  for(let i=0;i<r.length;i+=6)await Promise.all(r.slice(i,i+6).map(async k=>{const[,id,key]=k.split(':');try{const v=await fb('libimg/'+id+'/'+key);if(typeof v=='string'&&v)IM['~'+k]=v}catch(e){}}))}
@@ -439,7 +441,7 @@ function freeze(i){T[i].frozen=true;log(`❄️ ${W(T[cur])} đóng băng ${T[i]
 
 async function exportHW(){const ok=CUR.filter(o=>norm(o));if(!ok.length)return alert('Chưa có câu hỏi hợp lệ.');
  const t=prompt('Tiêu đề bài tập:','Ôn tập về nhà');if(t===null)return;
- const b=prompt('Địa chỉ host chứa thư mục ảnh (vd https://ten.github.io/bai1/ → ảnh image/a.png sẽ lấy từ https://ten.github.io/bai1/image/a.png). Để trống nếu ảnh nằm cạnh file HTML:','');if(b===null)return;
+ const b=prompt('Địa chỉ host chứa thư mục ảnh (vd https://ten.github.io/bai1/ → ảnh image/a.png sẽ lấy từ https://ten.github.io/bai1/image/a.png). Để trống để lấy ảnh từ repo chung tinhoc247/ic3-images:','');if(b===null)return;
  const cache={},toData=async x=>{if(!x||/^(data:|https?:|blob:)/.test(x))return x;const u=rs(x);if(!u.startsWith('blob:'))return x;if(!cache[x])cache[x]=fetch(u).then(r=>r.blob()).then(bl=>new Promise(res=>{const fr=new FileReader();fr.onload=()=>res(fr.result);fr.readAsDataURL(bl)}));return cache[x]},ok2=JSON.parse(JSON.stringify(ok));
  for(const o of ok2){if(o.image)o.image=await toData(o.image);if(o.preImage)o.preImage=await toData(o.preImage);if(o.optionImages)for(const m of o.optionImages)if(m&&m.src)m.src=await toData(m.src)}
  const hw={on:true,title:t,base:b.trim(),k:+$('#kPaths').value,m:Math.max(1,Math.floor(+$('#mSt').value)||5)},j=s=>JSON.stringify(s).replace(/</g,'\\u003c');
