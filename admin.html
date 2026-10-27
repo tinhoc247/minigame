@@ -98,7 +98,7 @@ select:disabled{opacity:1;color:var(--ink);-webkit-text-fill-color:var(--ink)}
   <label>Lối đi <select id="pType"><option value="mix">Ngẫu nhiên</option><option value="grass">Cỏ xanh</option><option value="stone">Đá</option></select></label></div></div>
  <div class="card" id="qCard"><div class="sh"><span class="num">2</span><h2>Câu hỏi</h2><button type="button" class="inf" data-i="Excel: cột A câu hỏi, B–E đáp án A–D, F đáp án đúng (A–D hoặc 1–4), G link hình.&#10;Hỗ trợ ngân hàng Spark (cột “Dữ liệu JSON”): single, multiple, list, matching, classify, classify2, ordering, position, imagepoint, dragfill, selectfill.&#10;Ảnh: để thư mục image/ cạnh file HTML hoặc bấm “Thư mục ảnh”; hình đặt trong thư mục (vd. image/…) cùng cấp với file HTML.&#10;Chưa nạp file thì dùng câu mẫu." aria-label="Ghi chú">i</button></div>
   <div id="qcount" class="qc"></div>
-  <div class="fl" style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><b>📚 Thư viện</b><select id="libSel" onchange="libPick()" style="flex:1;min-width:150px"><option value="">— chọn bộ đã lưu —</option></select><button type="button" class="alt mini" onclick="libView()">⚙ Quản lý</button></div><div id="libInfo" class="hint" style="margin:-8px 0 10px"></div>
+  <div class="fl" style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><b>📚 Thư viện</b><select id="libSel" onchange="libPick()" style="flex:1;min-width:150px"><option value="">— chọn bộ đã lưu —</option></select><button type="button" class="alt mini" onclick="libView()">📚 Mở thư viện</button></div><div id="libInfo" class="hint" style="margin:-8px 0 10px"></div>
   <label class="fl">File câu hỏi (.xlsx, .xls, .csv, .json)<input type="file" id="file" accept=".xlsx,.xls,.csv,.json"></label>
   <label class="fl chk"><input type="checkbox" id="onlyYes" checked> Chỉ dùng câu đánh dấu “Có”</label>
   <label class="fl">Thư mục ảnh<input type="file" id="imgdir" webkitdirectory multiple></label>
@@ -503,6 +503,7 @@ async function mkSes(){
  const s={code,title:$('#sT').value||code,mode:$('#sM').value,start:st,status:on?'waiting':'running',dur:dm,end:en,k:+$('#kPaths').value,m:Math.max(1,+$('#mSt').value||5),q:JSON.stringify(q),admin:ME,nq:q.length,seed:Math.random()*2147483647|0,pt:$('#pType').value,live:$('#sL').checked};
  er('');if(bt){bt.disabled=true;bt.textContent='Đang tạo…'}
  try{await store.put('sessions',code,s)}catch(e){if(bt){bt.disabled=false;bt.textContent='Tạo mã lượt'}return er('⚠️ Không tạo được mã: '+e.message)}
+ if(CURLIB)libPlay(CURLIB);
  if(on)return ctl(code);
  modal(`<h3>✅ Đã tạo lượt: ${esc(s.title)}</h3><div class="code">${code}</div><p>Offline (bài tập) · hiệu lực từ <b>${fmt(s.start)}</b> đến <b>${fmt(s.end)}</b>${INF('Gửi cho người chơi LINK TRANG NGƯỜI CHƠI (link của trang này, không có #admin) cùng mã trên.\nSau thời điểm trên, mã không còn tác dụng.')}</p><div class="btns"><button onclick="rep('${code}')">📊 Báo cáo lượt này</button><button class="alt" onclick="openAdmin()">Quay lại</button></div>`)}
 async function delSes(code){if(!confirm('Xóa lượt '+code+' cùng toàn bộ kết quả của học sinh?\nKhông thể khôi phục.'))return;try{await store.del('sessions/'+code);await store.del('results/'+code);await store.del('live/'+code)}catch(e){return alert('Không xóa được: '+e.message)}repList()}
@@ -620,16 +621,65 @@ async function libSave(name){const ok=CUR.filter(o=>norm(o));if(!ok.length)throw
  if(miss.length&&!confirm('Thiếu '+miss.length+' ảnh ('+[...new Set(miss)].slice(0,4).join(', ')+'). Câu có ảnh thiếu sẽ không hiện hình.\nVẫn lưu vào thư viện?'))throw Error('Đã huỷ — hãy chọn thư mục ảnh rồi lưu lại.');
  let n=0;for(let i=0;i<imgs.length;i+=4)await Promise.all(imgs.slice(i,i+4).map(async m=>{const d=await packImg(m.src);await fb('libimg/'+id+'/'+m.key,'PUT',d);libMsg('Đang lưu ảnh '+(++n)+'/'+imgs.length+'…')}));
  await fb('libq/'+id,'PUT',JSON.stringify(q));
- await fb('lib/'+id,'PUT',{name:(name||'Bộ câu hỏi').slice(0,80),nq:q.length,ni:imgs.length,created:Date.now(),admin:ME});
+ let cover='';if(imgs.length){try{cover=await thumb(imgs[0].src)}catch(e){}}
+ await fb('lib/'+id,'PUT',{name:(name||'Bộ câu hỏi').slice(0,80),nq:q.length,ni:imgs.length,created:Date.now(),edited:Date.now(),plays:0,cover,admin:ME});
  imgs.forEach(m=>{IM['~lib:'+id+':'+m.key]=m.src});CUR=q;SK=0;Q=CUR.map(norm).filter(Boolean);cnt();
  libMsg('✅ Đã lưu vào thư viện');return{id,n:q.length}}
 async function libSaveBtn(){if(!CUR.length)return libMsg('Hãy nạp file câu hỏi trước.');libMsg('Đang lưu vào thư viện…');
  try{const r=await libSave(($('#libName')&&$('#libName').value.trim())||'Bộ câu hỏi '+new Date().toLocaleDateString('vi-VN'));CURLIB=r.id;await libFill(r.id)}catch(e){libMsg('⚠️ '+e.message)}}
-async function libView(){modal('<h3>📚 Thư viện bộ câu hỏi</h3><p>Đang tải…</p>');let note='';try{LIB=await libList()}catch(e){LIB=[];note=e.message}
- modal(`<h3>📚 Thư viện bộ câu hỏi</h3>${note?`<p class="err">⚠️ ${esc(note)}</p>`:''}${LIB.length?`<table class="sb"><tr><th>Tên bộ</th><th>Câu</th><th>Ảnh</th><th>Lưu lúc</th><th></th></tr>${LIB.map(l=>`<tr><td><b>${esc(l.name)}</b></td><td>${l.nq}</td><td>${l.ni|0}</td><td>${fmt(l.created)}</td><td style="white-space:nowrap"><button class="mini" onclick="libUse('${l.id}')">✔ Dùng</button> <button class="mini" style="background:#64748b" onclick="libRen('${l.id}')">✏️</button> <button class="mini" style="background:#ef4444" onclick="libDel('${l.id}')">🗑</button></td></tr>`).join('')}</table>`:'<p>Thư viện còn trống. Nạp file câu hỏi ở trang chính rồi bấm “Lưu vào thư viện”.</p>'}<div class="btns"><button class="alt" onclick="bye()">Đóng</button></div>`)}
-async function libUse(id){bye();await libFill(id)}
-async function libRen(id){const l=LIB.find(x=>x.id==id),n=prompt('Tên mới của bộ câu hỏi:',l?l.name:'');if(!n||!n.trim())return;try{await fb('lib/'+id+'/name','PUT',n.trim().slice(0,80))}catch(e){return alert('Không đổi được tên: '+e.message)}await libFill();libView()}
+async function libView(){const o=libOv();o.innerHTML='<div class="lhd"><h2>📚 Thư viện của tôi</h2></div><p class="lnote">Đang tải thư viện…</p>';
+ let note='';try{LIB=await libList()}catch(e){LIB=[];note=e.message}
+ o.innerHTML=`<div class="lhd"><h2>📚 Thư viện của tôi</h2><input id="lq" class="lsr" placeholder="🔎 Tìm bộ câu hỏi…" value="${esc(LIBQ)}" oninput="LIBQ=this.value;libRender()"><select id="ls" class="lsr" onchange="LIBS=this.value;libRender()"><option value="new">Mới nhất</option><option value="az">Tên A–Z</option><option value="plays">Nhiều lượt nhất</option></select><button class="alt" onclick="libOvClose()">✕ Đóng</button></div><p id="lnote" class="lnote">${note?'⚠️ '+esc(note):''}</p><div id="lgrid" class="lgrid"></div>`;$('#ls').value=LIBS;libRender()}
+function libRender(){const g=$('#lgrid');if(!g)return;const q=LIBQ.trim().toLowerCase();
+ let L=LIB.filter(l=>!q||String(l.name||'').toLowerCase().includes(q));
+ L=[...L].sort(LIBS=='az'?(a,b)=>String(a.name).localeCompare(String(b.name),'vi'):LIBS=='plays'?(a,b)=>(b.plays|0)-(a.plays|0):(a,b)=>((b.edited||b.created)|0)-((a.edited||a.created)|0));
+ g.innerHTML=L.length?L.map(libCard).join(''):`<p class="lnote">${LIB.length?'Không có bộ nào khớp.':'Thư viện còn trống. Nạp file câu hỏi rồi bấm “💾 Lưu vào thư viện”.'}</p>`}
+function libCard(l){const cv=l.cover?`background-image:url('${l.cover}')`:`background:${libGrad(l.id)}`;
+ return `<div class="lc"><div class="lcv" style="${cv}">${l.cover?'':`<span class="lin">${esc(libIni(l.name))}</span>`}<span class="lk">🔒</span><span class="lq">${l.nq} câu hỏi</span></div><div class="lt" title="${esc(l.name)}">${esc(l.name)}</div><div class="lmt"><b>${l.plays|0} lượt tạo game</b><br>Sửa ${libAgo(l.edited||l.created)}</div><div class="la"><button onclick="libEdit('${l.id}')" title="Sửa tên / ảnh bìa">✏️</button><button onclick="libDel('${l.id}')" title="Xoá">🗑️</button><button onclick="libMenu(event,'${l.id}')" title="Thêm">•••</button></div><div class="lb"><button class="lg" onclick="libLeft('${l.id}')">${LIBLEFT}</button><button class="lh" onclick="libRight('${l.id}')">▶ Host</button></div></div>`}
+function libOv(){let o=$('#libov');if(!o){if(!$('#libcss'))document.head.insertAdjacentHTML('beforeend',LIBCSS);o=document.createElement('div');o.id='libov';document.body.appendChild(o)}return o}
+function libOvClose(){const o=$('#libov');if(o)o.remove();const m=$('#lmn');if(m)m.remove()}
+const LIBLEFT=typeof G=='function'?'📂 Chọn dùng':'📄 Assign',LB=typeof G=='function'?G:(p=>p);let LIBQ='',LIBS='new',LEC;
+const LIBCSS=`<style id="libcss">#libov{position:fixed;inset:0;z-index:8;overflow:auto;padding:14px clamp(10px,3vw,40px) 40px;background:linear-gradient(135deg,var(--bg1),var(--bg2))}
+#libov .lhd{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px}#libov .lhd h2{margin:0;color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.25);flex:1 1 200px;font-size:24px}
+#libov .lsr{padding:9px 12px;border-radius:10px;border:2px solid var(--line);background:var(--card);color:var(--ink);font:inherit;min-width:160px}
+.lnote{color:#fff;font-weight:700;margin:6px 0}.lgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
+.lc{position:relative;background:var(--card);border:2px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:0 3px 10px rgba(0,0,0,.18);display:flex;flex-direction:column}
+.lcv{position:relative;aspect-ratio:16/10;background-size:cover;background-position:center;display:flex;align-items:center;justify-content:center}
+.lin{font-size:clamp(34px,6vw,54px);font-weight:800;color:#fff;text-shadow:0 3px 0 rgba(0,0,0,.25);letter-spacing:2px}
+.lk{position:absolute;left:8px;bottom:8px;width:30px;height:30px;border-radius:8px;background:rgba(55,65,81,.92);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px}
+.lq{position:absolute;right:8px;bottom:8px;padding:6px 12px;border-radius:8px;background:rgba(55,65,81,.92);color:#fff;font-weight:700;font-size:14px}
+.lt{padding:10px 12px 2px;font-size:19px;font-weight:700;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lmt{padding:6px 12px 10px;font-size:14px;color:var(--mut);line-height:1.45}.lmt b{color:var(--ink)}
+.la{display:flex;border-top:1px solid var(--line)}.la button,.lb button{flex:1;margin:0;border-radius:0;box-shadow:none;background:transparent;color:var(--mut);padding:10px 0;font-size:18px}.la button+button{border-left:1px solid var(--line)}.la button:hover{background:rgba(14,165,233,.12)}
+.lb{display:flex;gap:8px;padding:8px;border-top:1px solid var(--line)}.lb button{border-radius:10px;font-size:16px;padding:10px 6px}.lb .lg{background:transparent;color:var(--ink)}.lb .lg:hover{background:rgba(0,0,0,.06)}.lb .lh{background:#0ec4d8;color:#fff;box-shadow:0 3px 0 #0a8f9e;font-size:18px}.lb .lh:active{transform:translateY(2px);box-shadow:0 1px 0 #0a8f9e}
+#lmn{position:fixed;z-index:12;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,.3);padding:4px;min-width:170px}#lmn button{display:block;width:100%;text-align:left;background:transparent;color:var(--ink);box-shadow:none;border-radius:8px;padding:9px 12px;font-weight:600}#lmn button:hover{background:rgba(14,165,233,.15)}</style>`;
+const libGrad=id=>{let h=0;for(const c of String(id))h=(h*31+c.charCodeAt(0))>>>0;const a=h%360;return `linear-gradient(135deg,hsl(${a},70%,52%),hsl(${(a+50)%360},75%,45%))`};
+const libIni=n=>String(n||'?').trim().split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase()||'?';
+function libAgo(t){if(!t)return '';const s=Math.max(0,(Date.now()-t)/1000);if(s<90)return 'vừa xong';const m=s/60;if(m<60)return Math.round(m)+' phút trước';const h=m/60;if(h<24)return Math.round(h)+' giờ trước';const d=h/24;if(d<30)return Math.round(d)+' ngày trước';if(d<365)return Math.round(d/30)+' tháng trước';return Math.round(d/365)+' năm trước'}
+function thumb(src,w=360,h=225){return new Promise((res,rej)=>{const t=setTimeout(()=>rej(Error('timeout')),5000),im=new Image();im.onload=()=>{clearTimeout(t);try{const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d'),k=Math.max(w/im.width,h/im.height),dw=im.width*k,dh=im.height*k;x.fillStyle='#fff';x.fillRect(0,0,w,h);x.drawImage(im,(w-dw)/2,(h-dh)/2,dw,dh);res(c.toDataURL('image/jpeg',.72))}catch(e){rej(e)}};im.onerror=()=>{clearTimeout(t);rej(Error('img'))};im.src=src})}
+function libMenu(ev,id){ev.stopPropagation();const old=$('#lmn');if(old)old.remove();const r=ev.currentTarget.getBoundingClientRect(),m=document.createElement('div');m.id='lmn';
+ m.innerHTML=`<button onclick="libShow('${id}')">👁 Xem câu hỏi</button><button onclick="libDup('${id}')">📑 Nhân bản</button><button onclick="libEdit('${id}')">✏️ Đổi tên / ảnh bìa</button>`;document.body.appendChild(m);
+ m.style.left=Math.min(r.left,innerWidth-190)+'px';m.style.top=Math.min(r.bottom+4,innerHeight-150)+'px'}
+document.addEventListener('click',()=>{const m=$('#lmn');if(m)m.remove()});
+async function libShow(id){const l=LIB.find(x=>x.id==id);modal('<h3>Đang tải…</h3>');try{const a=JSON.parse(await fb(LB('libq/'+id))||'[]');
+ modal(`<h3>👁 ${esc(l?l.name:'')}</h3><ol style="text-align:left;font-size:15px;max-height:55vh;overflow:auto;padding-left:24px">${a.map(x=>`<li style="margin:4px 0">${esc(String(x.question||x.q||'').slice(0,200))}</li>`).join('')}</ol><button class="alt" onclick="close_()">Đóng</button>`)}catch(e){modal('<h3>⚠️ '+esc(e.message)+'</h3><button class="alt" onclick="close_()">Đóng</button>')}}
+function libEdit(id){const l=LIB.find(x=>x.id==id);if(!l)return;LEC=undefined;
+ modal(`<h3>✏️ Sửa bộ câu hỏi</h3><input class="fld" id="eN" value="${esc(l.name)}" maxlength="80"><div class="lcv" id="eP" style="max-width:320px;margin:8px auto;border-radius:12px;${l.cover?`background-image:url('${l.cover}')`:`background:${libGrad(l.id)}`}">${l.cover?'':`<span class="lin">${esc(libIni(l.name))}</span>`}</div><div class="row" style="justify-content:center"><label class="hint">🖼️ Ảnh bìa mới <input type="file" id="eF" accept="image/*"></label><button class="alt mini" onclick="LEC='';$('#eP').style.background=libGrad('${l.id}');$('#eP').style.backgroundImage='none'">Bỏ ảnh bìa</button></div><p id="eE" class="err"></p><div class="row" style="justify-content:center"><button onclick="libEditSave('${id}')">💾 Lưu</button><button class="alt" onclick="close_()">Huỷ</button></div>`);
+ $('#eF').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{LEC=await thumb(URL.createObjectURL(f));$('#eP').style.backgroundImage=`url('${LEC}')`;$('#eP').innerHTML=''}catch(x){$('#eE').textContent='Không đọc được ảnh này.'}}}
+async function libEditSave(id){const n=$('#eN').value.trim();if(!n)return $('#eE').textContent='Nhập tên bộ.';const p={name:n.slice(0,80),edited:Date.now()};if(LEC!==undefined)p.cover=LEC;
+ try{await fb(LB('lib/'+id),'PATCH',p)}catch(e){return $('#eE').textContent='⚠️ '+e.message}close_();LIB=await libList();libRender();if($('#libSel'))libFill()}
+async function libDup(id){const l=LIB.find(x=>x.id==id);if(!l)return;const nt=$('#lnote');if(nt)nt.textContent='⏳ Đang nhân bản…';
+ try{const nid=ID(8);let qs=await fb(LB('libq/'+id));const keys=[...new Set(String(qs).match(/lib:[A-Za-z0-9]+:i\d+/g)||[])].filter(k=>k.split(':')[1]==id);
+  for(const k of keys){const key=k.split(':')[2],v=await fb(LB('libimg/'+id+'/'+key));if(v)await fb(LB('libimg/'+nid+'/'+key),'PUT',v)}
+  qs=qs.split('lib:'+id+':').join('lib:'+nid+':');await fb(LB('libq/'+nid),'PUT',qs);
+  const m={...l};delete m.id;m.name=(l.name+' (bản sao)').slice(0,80);m.plays=0;m.created=m.edited=Date.now();await fb(LB('lib/'+nid),'PUT',m);
+  LIB=await libList();libRender();if(nt)nt.textContent='✅ Đã nhân bản.'}catch(e){if(nt)nt.textContent='⚠️ '+e.message}}
 async function libDel(id){const l=LIB.find(x=>x.id==id);if(!confirm('Xoá bộ “'+(l?l.name:id)+'” khỏi thư viện cùng toàn bộ ảnh đã lưu?\nCác lượt chơi cũ dùng bộ này sẽ mất hình.\nKhông thể khôi phục.'))return;
- try{for(const p of['lib','libq','libimg'])await fb(p+'/'+id,'DELETE');if(CURLIB==id)CURLIB=null}catch(e){return alert('Không xoá được: '+e.message)}await libFill();libView()}
+ try{for(const p of['lib','libq','libimg'])await fb(LB(p+'/'+id),'DELETE');if(CURLIB==id)CURLIB=null}catch(e){return alert('Không xoá được: '+e.message)}LIB=await libList();libRender();if($('#libSel'))libFill()}
+const libPlay=id=>fb(LB('lib/'+id),'PATCH',{plays:{'.sv':{increment:1}}}).catch(()=>{});
+
+async function libGo(id,mode){libOvClose();await libFill(id);if(CURLIB!=id)return alert('Không nạp được bộ câu hỏi này.');openAdmin();$('#sM').value=mode;sModeUI()}
+function libLeft(id){libGo(id,'offline')}
+function libRight(id){libGo(id,'online')}
 </script>
 </body></html>
