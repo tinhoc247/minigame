@@ -87,7 +87,42 @@ select:disabled{opacity:1;color:var(--ink);-webkit-text-fill-color:var(--ink)}
 .btns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:12px}
 .adm .btns button{font-size:18px;padding:12px 24px}
 </style>
-</head><body>
+<style id="entry-css">
+@keyframes eflt{0%,100%{transform:translateY(0) rotate(-6deg)}50%{transform:translateY(-18px) rotate(6deg)}}
+@keyframes epop{from{opacity:0;transform:translateY(18px) scale(.96)}to{opacity:1;transform:none}}
+@keyframes ebob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes eshine{to{background-position:200% 0}}
+body:has(.entry.gold){background:linear-gradient(135deg,#ffd43b,#ff922b 48%,#f06595) fixed}
+body:has(.entry.sea){background:linear-gradient(135deg,#22d3ee,#34d399 50%,#bef264) fixed}
+.entry{--card:#fff;--ink:#1f2937;--mut:#64748b;--line:#e2e8f0;--badc:#dc2626;--okc:#15803d;position:relative;min-height:calc(100vh - 24px);display:grid;place-items:center;padding:16px 0;color:var(--ink)}
+.entry.gold{--ba:#ffe066;--bb:#fab005;--t1:#f76707;--t2:#d9480f;--g1:#ff922b;--g2:#f03e3e;--gs:#c92a2a;--gl:rgba(255,146,43,.28)}
+.entry.sea{--ba:#67e8f9;--bb:#2dd4bf;--t1:#0891b2;--t2:#059669;--g1:#06b6d4;--g2:#10b981;--gs:#0e7490;--gl:rgba(6,182,212,.28)}
+.entry .fl{position:fixed;font-style:normal;font-size:36px;opacity:.6;animation:eflt 6s ease-in-out infinite;pointer-events:none;user-select:none;filter:drop-shadow(0 4px 6px rgba(0,0,0,.18));z-index:0}
+.fl.f1{top:7%;left:8%}.fl.f2{top:13%;right:9%;animation-delay:-2s}.fl.f3{top:46%;left:4%;animation-delay:-4s;font-size:28px}
+.fl.f4{bottom:11%;right:7%;animation-delay:-1s}.fl.f5{bottom:9%;left:11%;animation-delay:-3s;font-size:30px}.fl.f6{top:38%;right:4%;animation-delay:-5s;font-size:26px}
+.ecard{position:relative;z-index:1;width:100%;max-width:400px;margin-top:44px;padding:60px 24px 22px;border-radius:28px;background:rgba(255,255,255,.97);text-align:center;box-shadow:0 22px 50px rgba(0,0,0,.22),0 0 0 6px rgba(255,255,255,.38);animation:epop .5s ease both}
+.ebadge{position:absolute;left:50%;top:-46px;width:92px;height:92px;margin-left:-46px;border-radius:50%;display:grid;place-items:center;font-size:48px;line-height:1;background:linear-gradient(145deg,var(--ba),var(--bb));box-shadow:0 10px 22px rgba(0,0,0,.25),inset 0 -5px 0 rgba(0,0,0,.1),0 0 0 6px #fff;animation:ebob 2.4s ease-in-out infinite}
+.etitle,.ecard h2{margin:0 0 4px;font-size:28px;font-weight:900;text-shadow:none;background:linear-gradient(90deg,var(--t1),var(--t2),var(--t1)) 0 0/200% auto;-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;animation:eshine 5s linear infinite}
+.ecard h2{font-size:24px}
+.esub,.ecard .hint{margin:0 0 16px;color:var(--mut);font-size:14px}
+.efield{position:relative;display:block;margin:0}
+.efield .eic{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:22px;pointer-events:none}
+.ecard input.fld{display:block;width:100%;margin:6px 0;padding:13px 14px;border:2.5px solid #e2e8f0;border-radius:16px;background:#f8fafc;color:#1f2937;font-size:18px;font-weight:700;text-align:center;outline:0;transition:border-color .2s,box-shadow .2s,background .2s}
+.ecard input.fld::placeholder{color:#94a3b8;font-weight:700}
+.ecard #jC{padding:14px 48px;font-size:26px;font-weight:900;letter-spacing:.3em;text-indent:.3em}
+.ecard #jC::placeholder{font-size:17px;letter-spacing:.08em;text-indent:0}
+.ecard input.fld:focus{border-color:var(--g1);background:#fff;box-shadow:0 0 0 4px var(--gl)}
+.eerr,.ecard #jE{min-height:1.3em;margin:8px 0 6px;font-weight:700;font-size:14px;color:var(--badc)}
+.ecard>button{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;border-radius:16px;font-size:20px;font-weight:800;color:#fff;background:linear-gradient(135deg,var(--g1),var(--g2));box-shadow:0 5px 0 var(--gs),0 12px 20px rgba(0,0,0,.16);transition:transform .15s,box-shadow .15s}
+.ecard>button:hover{transform:translateY(-2px)}
+.ecard>button:active{transform:translateY(4px);box-shadow:0 1px 0 var(--gs),0 4px 8px rgba(0,0,0,.16)}
+.ecard>button b{transition:transform .2s}.ecard>button:hover b{transform:translateX(5px)}
+.elogin{display:inline-flex;align-items:center;gap:6px;margin-top:18px;padding:7px 15px;border-radius:999px;background:#f1f5f9;color:#475569;font-size:13px;font-weight:700;text-decoration:none;transition:background .2s,transform .2s}
+.elogin:hover{background:#e2e8f0;color:#0f172a;transform:translateY(-1px)}
+.ecard .avb{border-radius:14px}
+@media(max-width:480px){.ecard{padding:58px 16px 18px}.etitle{font-size:25px}.ecard #jC{font-size:24px}}
+@media(prefers-reduced-motion:reduce){.entry *{animation:none!important}}
+</style></head><body>
 
 <div id="setup"><div class="setup">
  <div style="grid-column:1/-1"><h1>🏝️ Truy Tìm Kho Báu</h1></div>
@@ -565,11 +600,11 @@ function drawGhosts(){if(!liveOn()||!P.length||!$('#pawns'))return;
 (function(){const r0=render;render=function(){r0();if(liveOn()){livePush();if(!window.LVT){window.LVT=setInterval(pollLive,3000);pollLive()}drawGhosts()}}})();
 const ADM=window.APPMODE=='admin';
 function lobby(msg){$('.setup').style.display='none';
- $('#setup').insertAdjacentHTML('beforeend','<div class="card" id="lobc" style="max-width:420px;margin:8vh auto;text-align:center">'+(msg?'<h2>🔒 '+msg+'</h2>':'<h1 style="color:#0369a1;text-shadow:none">🏝️ Truy Tìm Kho Báu</h1><input class="fld" id="jC" placeholder="NHẬP MÃ GAME" maxlength="5" style="text-transform:uppercase;text-align:center;font-size:24px;padding:12px 10px;line-height:1.5"><p id="jE" style="color:var(--badc);font-weight:700;min-height:1.2em"></p><button onclick="codeNext()" style="width:100%;font-size:20px">Tiếp tục</button><p style="margin:12px 0 0"><a href="admin.html" class="hint" style="text-decoration:underline">🔑 Đăng nhập</a></p>')+'</div>');
+ $('#setup').insertAdjacentHTML('beforeend',`<div class="entry sea"><i class="fl f1">🌴</i><i class="fl f2">🧭</i><i class="fl f3">🗺️</i><i class="fl f4">💎</i><i class="fl f5">🦜</i><i class="fl f6">⛵</i><div class="ecard" id="lobc">${msg?`<div class="ebadge">🔒</div><h2>${msg}</h2>`:`<div class="ebadge">🏝️</div><h1 class="etitle">Truy Tìm Kho Báu</h1><p class="esub">🧭 Nhập mã game để bắt đầu cuộc phiêu lưu!</p><label class="efield"><span class="eic">🎟️</span><input class="fld" id="jC" placeholder="NHẬP MÃ GAME" maxlength="5" autocomplete="off" style="text-transform:uppercase"></label><p id="jE" class="eerr"></p><button class="ego" onclick="codeNext()">Tiếp tục <b>➜</b></button><a class="elogin" href="admin.html">🔑 Đăng nhập</a>`}</div></div>`);
  const c=$('#jC');if(c){c.onkeydown=e=>{if(e.key=='Enter')codeNext()};c.focus()}}
 async function codeNext(){const code=$('#jC').value.trim().toUpperCase(),er=m=>$('#jE').textContent=m;if(!code)return er('Nhập mã game.');er('Đang kiểm tra…');
  try{const s=await store.get('sessions/'+code);if(!s)return er('Mã không đúng.');if(Date.now()>s.end)return er('🔒 Mã đã hết hạn.');if(Date.now()<s.start)return er('⏳ Chưa đến giờ mở. Mở lúc '+fmt(s.start)+'.');
-  $('#lobc').innerHTML=`<h2>${esc(s.title)}</h2><p class="hint">${s.mode=='online'?'Chơi cùng mọi người · chờ quản trò bắt đầu':'Bài tập về nhà'} · mã <b>${code}</b></p><input type="hidden" id="jC" value="${code}"><input class="fld" id="jN" placeholder="Tên của em" maxlength="30"><div style="font-weight:700;font-size:13px;margin-top:6px">Chọn nhân vật</div><div class="avs" style="margin-bottom:8px"></div><p id="jE" style="color:var(--badc);font-weight:700;min-height:1.2em"></p><button onclick="doJoin()" style="width:100%;font-size:20px">▶ ${s.mode=='online'?'Vào phòng chờ':'Bắt đầu'}</button>`;
+  $('#lobc').innerHTML=`<div class="ebadge">🎮</div><h2>${esc(s.title)}</h2><p class="hint">${s.mode=='online'?'Chơi cùng mọi người · chờ quản trò bắt đầu':'Bài tập về nhà'} · mã <b>${code}</b></p><input type="hidden" id="jC" value="${code}"><input class="fld" id="jN" placeholder="Tên của em" maxlength="30"><div style="font-weight:700;font-size:13px;margin-top:6px">Chọn nhân vật</div><div class="avs" style="margin-bottom:8px"></div><p id="jE" style="color:var(--badc);font-weight:700;min-height:1.2em"></p><button onclick="doJoin()" style="width:100%;font-size:20px">▶ ${s.mode=='online'?'Vào phòng chờ':'Bắt đầu'}</button>`;
   document.querySelectorAll('#lobc .avs').forEach(d=>d.innerHTML=AV.map(a=>`<button class="avb${a==AVSEL?' on':''}" data-a="${a}">${a}</button>`).join(''));$('#jN').focus()}catch(e){er('Lỗi kết nối: '+e.message)}}
 if(!HW.on){if(!ADM)lobby();else{document.querySelectorAll('button[onclick="openJoin()"],button[onclick="start()"],button[onclick="exportHW()"]').forEach(b=>b.style.display='none');const h=document.querySelector('.setup h1');document.querySelectorAll('.setup>.card')[1].style.display='none';if(h)h.textContent='🔑 Trang Admin – Truy Tìm Kho Báu';(async()=>{try{const u=await claude.use('user');if(u&&!u.canEdit()){document.querySelector('.setup').style.display='none';lobby('Chỉ admin mới vào được trang này.')}}catch(e){}})()}}
 
