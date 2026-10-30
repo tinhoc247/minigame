@@ -433,7 +433,7 @@ function backQ(){SHQ=false;const d=DQ;if(!d)return close_();showQ(d.q,d.cb,d.pre
 function useItem(k){const t=T[cur];if(!t.inv[k]||!RCB)return;t.inv[k]--;IU=ITM[k];render();RCB(true)}
 const W=t=>T.length>1?t.name:'Bạn';
 function log(m){const l=$('#log');l.innerHTML=`<div>• ${m}</div>`+l.innerHTML}
-function modal(h){$('#mbox').innerHTML=h;$('#modal').style.display='flex'}
+function modal(h){$('#mbox').innerHTML=h;$('#modal').classList.remove('qfull');$('#modal').style.display='flex'}
 function endAsk(){modal(`<div class="big">🏁</div><h3>Kết thúc game?</h3><p>Trò chơi sẽ dừng lại và hiển thị kết quả hiện tại.</p><button onclick="endGame()">🏁 Kết thúc</button> <button class="alt" onclick="close_()">↩ Chơi tiếp</button>`)}
 function endGame(){window.FIN&&FIN();try{typeof AC!='undefined'&&AC&&AC.state=='running'&&AC.suspend()}catch(e){}
 const md=['🥇','🥈','🥉'],R=T.map((t,i)=>({t,i})).sort((a,b)=>b.t.pos-a.t.pos||b.t.gold-a.t.gold),
@@ -474,7 +474,7 @@ function showQ(q,cb,pre,use,dn){DQ=dn?{q,cb,pre,dn}:null;RCB=cb;IU=null;CB=o=>{S
  else{if(ty=='rows')h+=q.rows.map((r,i)=>`<div class="rw qr" id="rw${i}"><span>${esc(r.l)}</span><select id="sel${i}"><option value="">- Select -</option>${r.o.map((o,j)=>`<option value="${j}">${esc(o)}</option>`).join('')}</select><b id="mk${i}" class="mk"></b></div>`).join('');
   else h+=q.o.map((o,i)=>`<button class="opt tg" data-i="${i}" onclick="this.classList.toggle('sel')">${ob(q,i)}</button>`).join('');
   h+=`<div id="fb"></div><button id="chk" onclick="check()" style="margin-top:6px">✔ Kiểm tra đáp án</button>`}
- modal(h);if(ty=='ord')ordDraw();if(ty=='fill'||ty=='slot'||ty=='cls')fillDraw()}
+ modal(h);$('#modal').classList.add('qfull');if(ty=='ord')ordDraw();if(ty=='fill'||ty=='slot'||ty=='cls')fillDraw()}
 function exH(s){return esc(s||'').replace(/&lt;(\/?)(b|i|u)&gt;|&lt;br\s*\/?&gt;/gi,(m,a,t)=>t?'<'+a+t+'>':'<br>')}
 function ansBox(l){return l.length?`<div class="ans"><b>✅ Đáp án đúng:</b>${l.map(x=>`<div>${x}</div>`).join('')}</div>`:''}
 function fillAns(q){const c=b=>`<b style="color:var(--okc)">${esc(q.ch[q.a[b]])}</b>`;
@@ -1027,6 +1027,55 @@ d.addEventListener('fullscreenchange',function(){if(!isF())chk()});
 d.addEventListener('webkitfullscreenchange',function(){if(!isF())chk()});
 setInterval(chk,700);
 ['keydown','keyup','keypress'].forEach(function(n){window.addEventListener(n,function(ev){if(paused){ev.stopImmediatePropagation();ev.preventDefault()}},true)});
+})();
+</script>
+<style id="qfull-css">
+
+
+#modal.qfull{--card:#fff;--ink:#0b1220;--mut:#334155;--okc:#166534;--badc:#991b1b;--line:#64748b;padding:0!important;background:#fff!important;backdrop-filter:none!important;align-items:stretch!important;justify-content:stretch!important;z-index:50!important}
+#modal.qfull .box{max-width:none!important;width:100vw!important;height:100vh!important;height:100dvh!important;max-height:none!important;border:0!important;border-radius:0!important;box-shadow:none!important;animation:none!important;background:#fff!important;color:#0b1220!important;padding:clamp(12px,min(3vw,4vh),44px)!important;overflow:auto!important;display:flex!important;flex-direction:column!important;text-align:left!important;font-size:clamp(20px,2.6vw,34px)!important;line-height:1.5!important}
+#modal.qfull .box>:first-child{margin-top:auto!important}#modal.qfull .box>:last-child{margin-bottom:auto!important}#modal.qfull .box>*{width:100%!important;max-width:1300px!important;margin-left:auto!important;margin-right:auto!important}
+#modal.qfull h3{font-size:clamp(24px,min(3.6vw,6.2vh),52px)!important;text-align-last:left!important;line-height:1.35!important;font-weight:800!important;color:#0b1220!important;text-align:left!important;margin:6px auto 12px!important;white-space:pre-line!important}
+#modal.qfull .qimg{max-height:40vh!important;max-width:100%!important;object-fit:contain!important;border-radius:12px!important;margin:8px auto!important;display:block!important}
+#modal.qfull .opt{font-size:clamp(19px,min(2.7vw,4.6vh),36px)!important;line-height:1.35!important;font-weight:700!important;padding:clamp(8px,1.4vh,20px) clamp(14px,2vw,30px)!important;margin:clamp(5px,1vh,14px) auto!important;display:flex!important;align-items:center!important;text-align:left!important;background:#eff6ff!important;color:#0b1220!important;border:3px solid #1d4ed8!important;border-radius:16px!important;box-shadow:none!important;white-space:normal!important;overflow-wrap:anywhere!important}
+#modal.qfull .opt:hover:not(:disabled){background:#fef08a!important;color:#0b1220!important;border-color:#a16207!important;box-shadow:none!important}
+#modal.qfull .opt.sel{background:#fde047!important;color:#0b1220!important;border-color:#854d0e!important;box-shadow:none!important}
+#modal.qfull .opt.ok{background:#15803d!important;color:#fff!important;border-color:#14532d!important;box-shadow:none!important}
+#modal.qfull .opt.bad{background:#b91c1c!important;color:#fff!important;border-color:#7f1d1d!important;box-shadow:none!important}
+#modal.qfull .rw,#modal.qfull .oi{font-size:clamp(19px,2.4vw,32px)!important;color:#0b1220!important;background:#f8fafc!important;border:3px solid #475569!important;padding:clamp(10px,1.4vw,18px)!important}
+#modal.qfull .oi.ok,#modal.qfull .rw.ok{background:#bbf7d0!important;border-color:#15803d!important}
+#modal.qfull .oi.bad,#modal.qfull .rw.bad{background:#fecaca!important;border-color:#b91c1c!important}
+#modal.qfull .chip,#modal.qfull .bl{font-size:clamp(19px,2.4vw,32px)!important;color:#0b1220!important;background:#dbeafe!important;border:3px solid #1d4ed8!important;padding:6px 14px!important}
+#modal.qfull .chip.on{background:#fde047!important;border-color:#854d0e!important}
+#modal.qfull .chip.ok{background:#15803d!important;color:#fff!important}#modal.qfull .chip.bad{background:#b91c1c!important;color:#fff!important}
+#modal.qfull .tb{background:#eff6ff!important;color:#0b1220!important;border:3px solid #1d4ed8!important;box-shadow:none!important;font-size:clamp(20px,2.4vw,32px)!important}
+#modal.qfull .tb.ok{background:#15803d!important;color:#fff!important}#modal.qfull .tb.bad{background:#b91c1c!important;color:#fff!important}
+#modal.qfull select{font-size:clamp(18px,2.2vw,30px)!important;color:#0b1220!important;background:#fff!important;border:3px solid #1d4ed8!important;border-radius:10px!important;padding:8px 10px!important;max-width:100%!important}
+#modal.qfull .area{font-size:clamp(20px,2.6vw,34px)!important;line-height:2.1!important;color:#0b1220!important}
+#modal.qfull .ans,#modal.qfull .ex,#modal.qfull .hint{font-size:clamp(18px,2.2vw,30px)!important;color:#0b1220!important}
+#modal.qfull .ex{background:#e0f2fe!important;border-left:8px solid #0369a1!important}
+#modal.qfull .ans{background:#dcfce7!important;border-left:8px solid #15803d!important}
+#modal.qfull #fb p{font-size:clamp(22px,3vw,40px)!important;color:#0b1220!important}
+#modal.qfull button:not(.opt):not(.tb):not(.mini):not(.csb):not(.chip):not(.bl){font-size:clamp(20px,2.6vw,34px)!important;padding:clamp(12px,1.6vw,22px) clamp(22px,3vw,44px)!important;border-radius:16px!important;font-weight:800!important;background:#1d4ed8!important;color:#fff!important;border:3px solid #1e3a8a!important;box-shadow:none!important;width:auto!important;display:block!important;margin:18px auto 0!important}
+
+</style>
+<script id="selpk-js">
+/* Danh sách chọn đáp án rộng, tự xuống dòng (thay cho dropdown mặc định bị tràn khi đáp án dài) – chỉ dùng với chuột */
+(function(){var d=document,ov=null,st=d.createElement('style');
+st.textContent='#mbox select{max-width:100%;text-overflow:ellipsis}#selpk{position:fixed;inset:0;z-index:2147482000;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:14px}'
++'#selpk .spb{width:min(760px,96vw);max-height:84vh;overflow:auto;background:var(--card,#fff);color:var(--ink,#1f2937);border-radius:16px;padding:10px;box-shadow:0 12px 40px rgba(0,0,0,.45);font-family:inherit}'
++'#selpk .spt{font-weight:800;font-size:15px;padding:4px 6px 8px;opacity:.75}'
++'#selpk .spi{padding:11px 14px;margin:5px 0;border:2px solid var(--line,#e5e7eb);border-radius:12px;font-size:17px;line-height:1.4;white-space:normal;overflow-wrap:anywhere;text-align:left;cursor:pointer}'
++'#selpk .spi:hover,#selpk .spi:focus{border-color:#f97316;background:rgba(249,115,22,.12);outline:none}#selpk .spi.on{border-color:#f97316;font-weight:800;background:rgba(249,115,22,.2)}#selpk .spi.nil{font-size:14px;opacity:.7;text-align:center}';
+d.head.appendChild(st);
+function close(){if(ov){ov.remove();ov=null}}
+function open(s){close();ov=d.createElement('div');ov.id='selpk';var b=d.createElement('div');b.className='spb';var t=d.createElement('div');t.className='spt';t.textContent='Chọn đáp án';b.appendChild(t);
+ Array.prototype.forEach.call(s.options,function(o,i){var it=d.createElement('div');it.className='spi'+(o.value===''?' nil':'')+(i===s.selectedIndex&&o.value!==''?' on':'');it.tabIndex=0;it.setAttribute('role','option');it.textContent=o.value===''?'— Bỏ chọn —':o.text;
+  var pick=function(ev){ev.stopPropagation();s.value=o.value;close();s.dispatchEvent(new Event('input',{bubbles:true}));s.dispatchEvent(new Event('change',{bubbles:true}));try{s.focus()}catch(x){}};
+  it.addEventListener('click',pick);it.addEventListener('keydown',function(ev){if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();pick(ev)}});b.appendChild(it)});
+ ov.appendChild(b);ov.addEventListener('click',close);d.body.appendChild(ov);var on=b.querySelector('.spi.on');if(on)on.scrollIntoView({block:'center'})}
+d.addEventListener('mousedown',function(e){var s=e.target&&e.target.closest&&e.target.closest('#mbox select');if(!s||s.disabled||e.button!==0)return;if(window.matchMedia&&matchMedia('(pointer:coarse)').matches)return;e.preventDefault();open(s)},true);
+d.addEventListener('keydown',function(e){if(e.key==='Escape')close()},true);
 })();
 </script>
 </body></html>
